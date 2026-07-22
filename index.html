@@ -545,7 +545,7 @@ body.present #jte-thumbs{z-index:9985}
         <span class="cap" style="color:var(--t3)" data-editable="true">職業健康與安全</span>
       </div>
       <div class="h3" style="font-size:18px;margin-top:10px" data-editable="true">員工健康與福祉</div>
-      <div class="sm" style="margin-top:8px;line-height:1.65" data-editable="true">以「能量快測」與幸福感常模做連續性追蹤，主動識別高耗能／倦怠邊緣族群，並即時給出微課程與聲音療癒補給。</div>
+      <div class="sm" style="margin-top:8px;line-height:1.65" data-editable="true">用能量快測連續追蹤，及早找出倦怠邊緣員工，即時補給微課程與聲音療癒。</div>
       <div class="sm" style="margin-top:10px;color:var(--blue);font-weight:600" data-editable="true">從「辦了幾場」→ 升級為「改變了多少」</div>
     </div>
     <div style="flex:1;background:var(--bg-gray);border-radius:16px;padding:20px 22px">
@@ -554,7 +554,7 @@ body.present #jte-thumbs{z-index:9985}
         <span class="cap" style="color:var(--t3)" data-editable="true">僱用與留才</span>
       </div>
       <div class="h3" style="font-size:18px;margin-top:10px" data-editable="true">人才吸引與留任</div>
-      <div class="sm" style="margin-top:8px;line-height:1.65" data-editable="true">把能量管理與留才績效做因果連結：高壓部門導入能量教練陪伴後之離職率變化，可直接寫進永續報告書。</div>
+      <div class="sm" style="margin-top:8px;line-height:1.65" data-editable="true">高壓部門導入能量教練後的離職率變化，可直接寫進永續報告書。</div>
       <div class="sm" style="margin-top:10px;color:var(--blue);font-weight:600" data-editable="true">每留住一位關鍵人才 ＝ 省下實質招募與沉沒成本</div>
     </div>
     <div style="flex:1;background:var(--bg-gray);border-radius:16px;padding:20px 22px">
@@ -563,7 +563,7 @@ body.present #jte-thumbs{z-index:9985}
         <span class="cap" style="color:var(--t3)" data-editable="true">人力資本治理</span>
       </div>
       <div class="h3" style="font-size:18px;margin-top:10px" data-editable="true">預警機制與敏捷決策</div>
-      <div class="sm" style="margin-top:8px;line-height:1.65" data-editable="true">以去識別化的心情點記與 HRV 數據，讓管理階層在不侵犯隱私下掌握部門集體能量，於危機發生前提早調整。</div>
+      <div class="sm" style="margin-top:8px;line-height:1.65" data-editable="true">用去識別化數據，讓主管不侵犯隱私就看見部門集體能量，提早因應。</div>
       <div class="sm" style="margin-top:10px;color:var(--blue);font-weight:600" data-editable="true">集體倦怠 ＝ 重大營運風險，可控管、可揭露</div>
     </div>
   </div>
@@ -571,7 +571,7 @@ body.present #jte-thumbs{z-index:9985}
     <div style="flex:1.5;background:var(--blue);border-radius:16px;padding:16px 22px;color:#fff">
       <div class="cap" style="color:var(--blue-soft);font-weight:700;letter-spacing:.06em" data-editable="true">報告書寫法升級 · 範例</div>
       <div class="sm" style="color:rgba(255,255,255,.62);margin-top:7px" data-editable="true">傳統寫法：舉辦員工正念減壓講座，參與人次 100 人。</div>
-      <div class="sm" style="color:#fff;font-weight:600;margin-top:4px;line-height:1.6" data-editable="true">練息場升級：導入 90 天能量訓練營，識別 15% 高耗能／倦怠邊緣員工並即時介入，整體心理幸福感提升 23%。</div>
+      <div class="sm" style="color:#fff;font-weight:600;margin-top:4px;line-height:1.6" data-editable="true">練息場升級：90 天能量訓練營，找出 15% 高耗能員工即時介入，幸福感提升 23%。</div>
     </div>
     <div style="flex:1;background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px 20px">
       <div class="cap" style="font-weight:700;letter-spacing:.06em;color:var(--t3)" data-editable="true">對應 SDGs</div>
@@ -758,9 +758,46 @@ body.present #jte-thumbs{z-index:9985}
 <script>
 (function(){
  let curImg=null,curBox=null;
- function initText(){document.querySelectorAll('[data-editable="true"]').forEach(el=>{el.setAttribute('contenteditable','true');el.setAttribute('spellcheck','false');el.addEventListener('paste',e=>{e.preventDefault();const t=(e.clipboardData||window.clipboardData).getData('text');document.execCommand('insertText',false,t);});});}
+ var JTE_EDIT=(new URLSearchParams(location.search).get('edit')||'').trim();
+ var JTE_EDITMODE=!!JTE_EDIT;
+ var _jteSaveTimer=null,_jteLastSaved='';
+ function jteDeckHTML(){var d=document.querySelector('.deck');if(!d)return '';var c=d.cloneNode(true);c.querySelectorAll('[contenteditable]').forEach(function(e){e.removeAttribute('contenteditable');e.removeAttribute('spellcheck');});return c.innerHTML;}
+ async function jteCloudLoad(){
+   try{
+     var r=await fetch('/api/deck',{cache:'no-store'});
+     if(!r.ok)return;
+     var j=await r.json();
+     if(j&&j.ok&&j.html&&typeof j.html==='string'&&j.html.length>50){
+       var d=document.querySelector('.deck');
+       if(d){d.innerHTML=j.html;_jteLastSaved=j.html;}
+     }
+   }catch(e){}
+ }
+ async function jteCloudSave(manual){
+   if(!JTE_EDITMODE)return;
+   var html=jteDeckHTML();
+   if(!html||html.length<50)return;
+   if(!manual&&html===_jteLastSaved)return;
+   jteCloudStatus('☁ 存檔中…','wait');
+   try{
+     var r=await fetch('/api/deck',{method:'POST',headers:{'content-type':'application/json','x-edit-key':JTE_EDIT},body:JSON.stringify({html:html})});
+     var j=await r.json();
+     if(r.ok&&j.ok){_jteLastSaved=html;jteCloudStatus('☁ 已存雲端 '+(j.savedAt||'').slice(11,16),'ok');}
+     else if(r.status===403){jteCloudStatus('⚠️ 密鑰錯了，沒存成','err');}
+     else{jteCloudStatus('⚠️ 存檔失敗','err');}
+   }catch(e){jteCloudStatus('⚠️ 連不上雲端','err');}
+ }
+ function jteCloudSaveDebounced(){if(!JTE_EDITMODE)return;clearTimeout(_jteSaveTimer);_jteSaveTimer=setTimeout(function(){jteCloudSave(false);},1500);}
+ function jteCloudStatus(msg,kind){var el=document.getElementById('jte-cloud-status');if(!el)return;el.textContent=msg;el.style.color=kind==='ok'?'#2E7D32':kind==='err'?'#C0392B':kind==='wait'?'#8A6D0B':'#4A5A6E';}
+ function jteMarkReadOnly(){var pp=document.getElementById('penToggle');if(pp)pp.style.display='none';var tt=document.getElementById('dockTools');if(tt)tt.style.display='none';}
+ function jteMarkEditMode(){
+   var t=document.getElementById('dockTools');
+   if(t){var b=document.createElement('button');b.className='jte-tool-btn';b.innerHTML='☁ 存到雲端';b.onclick=function(){jteCloudSave(true);};t.insertBefore(b,t.firstChild);}
+   var badge=document.createElement('div');badge.id='jte-cloud-status';badge.style.cssText='position:fixed;left:16px;bottom:20px;z-index:99998;font-size:13px;font-weight:700;background:#fff;border:1px solid #E1E6EE;border-radius:20px;padding:7px 14px;box-shadow:0 4px 16px rgba(0,0,0,.12);color:#4A5A6E';badge.textContent='✏️ 編輯模式（改動會自動存雲端）';document.body.appendChild(badge);
+ }
+ function initText(){if(!JTE_EDITMODE)return;document.querySelectorAll('[data-editable="true"]').forEach(el=>{el.setAttribute('contenteditable','true');el.setAttribute('spellcheck','false');el.addEventListener('paste',e=>{e.preventDefault();const t=(e.clipboardData||window.clipboardData).getData('text');document.execCommand('insertText',false,t);});});}
  function initImg(){
-   document.querySelectorAll('[data-img-editable="true"]').forEach(img=>img.addEventListener('click',e=>{e.preventDefault();curImg=img;curBox=null;showModal();}));
+   document.querySelectorAll('[data-img-editable="true"]').forEach(img=>img.addEventListener('click',e=>{if(!JTE_EDITMODE)return;e.preventDefault();curImg=img;curBox=null;showModal();}));
    document.querySelectorAll('[data-imgbox="true"]').forEach(box=>{
      // (a) migrate legacy background-image fill -> img model
      const bg=box.style.backgroundImage;
@@ -772,6 +809,7 @@ body.present #jte-thumbs{z-index:9985}
      // (b) pre-existing fill img from a saved file -> reattach controls/listeners
      else { const ex=box.querySelector('.jte-fill-img'); if(ex && !box._jteBound){ jteFillBox(box, ex.src, st); } }
      box.addEventListener('click',e=>{
+       if(!JTE_EDITMODE)return;
        if(e.target.getAttribute&&e.target.getAttribute('contenteditable'))return;
        if(e.target.closest&&e.target.closest('.jte-imgctl'))return;
        if(e.target.classList&&e.target.classList.contains('jte-fill-img'))return; // dragging handled separately; click on img won't reopen
@@ -795,7 +833,7 @@ body.present #jte-thumbs{z-index:9985}
  function applySrc(src){
    if(curImg){curImg.src=src;}
    else if(curBox){ jteFillBox(curBox, src); }
-   jteClose();}
+   jteClose();if(typeof jteCloudSaveDebounced==='function')jteCloudSaveDebounced();}
  window.jteFillBox=function(box,src,state){
    box.classList.add('filled');
    box.style.backgroundImage='';
@@ -857,7 +895,7 @@ body.present #jte-thumbs{z-index:9985}
      });
      window.addEventListener('mouseup',e=>{
        if(dragging){
-         dragging=false; exitAdjust(); apply();
+         dragging=false; exitAdjust(); apply(); if(typeof jteCloudSaveDebounced==='function')jteCloudSaveDebounced();
          if(!moved){const bx=box;setTimeout(function(){curBox=bx;curImg=null;showModal();},0);}
        }
      });
@@ -1240,7 +1278,12 @@ body.present #jte-thumbs{z-index:9985}
  document.getElementById('jte-thumbs').addEventListener('click',function(e){if(e.target.id==='jte-thumbs')e.currentTarget.classList.remove('open');});
  jteUpdatePg();
 
- function boot(){initText();initImg();}
+ async function boot(){
+   await jteCloudLoad();
+   jteSlides=[].slice.call(document.querySelectorAll('.slide'));
+   initText();initImg();jteUpdatePg();
+   if(JTE_EDITMODE){document.addEventListener('input',function(e){if(e.target&&e.target.closest&&e.target.closest('.deck'))jteCloudSaveDebounced();});jteMarkEditMode();}else{jteMarkReadOnly();}
+ }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
