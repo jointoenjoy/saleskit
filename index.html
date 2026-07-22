@@ -538,11 +538,20 @@ body.present #jte-thumbs{z-index:9985}
      <div class="sm" style="font-weight:600;color:var(--green);margin-top:14px" data-editable="true">可回收人資成本</div>
      <div style="font-size:62px;font-weight:300;color:var(--green);letter-spacing:-.03em" data-editable="true">NT$5+</div>
    </div>
-   <div class="card-b" style="flex:1;display:flex;flex-direction:column;justify-content:center">
-     <div class="sm" style="color:var(--blue-soft);font-weight:600;letter-spacing:.04em" data-editable="true">人資價值（130人 行銷產業 試算）</div>
-     <div style="font-size:88px;font-weight:300;letter-spacing:-.04em;margin-top:4px" data-editable="true">NT$1,600萬</div>
-     <div class="sm" style="color:var(--blue-soft);margin-top:14px" data-editable="true">130人 × 8% 離職率下降 = 10.4 人次不流失</div>
-     <div class="sm" style="color:var(--blue-soft);opacity:.85;margin-top:4px" data-editable="true">× 年薪 80萬 × 離職成本 2倍 = NT$16,640,000</div>
+   <div class="card-b" id="jte-ret" style="flex:1;display:flex;flex-direction:column;justify-content:center">
+     <div style="font-size:20px;font-weight:700;letter-spacing:.01em;color:#fff" data-editable="true">人資價值試算</div>
+     <div class="sm" style="color:rgba(255,255,255,.65);margin-top:4px" data-editable="true">請輸入以下數據</div>
+     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:9px 14px;margin-top:12px;color:rgba(255,255,255,.9);font-size:16px">
+       <span>員工 <input class="jte-cin" id="jte-c-emp" type="number" value="100" min="0"> 人</span>
+       <span>平均年薪 <input class="jte-cin" id="jte-c-sal" type="number" value="80" min="0"> 萬</span>
+       <span>離職成本 <input class="jte-cin" id="jte-c-mult" type="number" value="1.5" min="0" step="0.1"> 倍</span>
+       <span>離職率下降 <input class="jte-cin" id="jte-c-drop" type="number" value="5" min="0" step="0.1"> ％</span>
+     </div>
+     <div style="height:1px;background:rgba(255,255,255,.18);margin:18px 0"></div>
+     <div class="sm" style="color:rgba(255,255,255,.8);font-weight:600" data-editable="true">每年可省</div>
+     <div id="jte-c-big" style="font-size:58px;font-weight:300;letter-spacing:-.035em;line-height:1.02;margin-top:4px;color:#fff;font-variant-numeric:tabular-nums">NT$ 6,000,000</div>
+     <div class="sm" id="jte-c-sub" style="color:rgba(255,255,255,.82);margin-top:14px;font-variant-numeric:tabular-nums">三年累積約 NT$ 18,000,000</div>
+     <div class="sm" style="margin-top:14px;color:rgba(255,255,255,.6);line-height:1.5;font-size:12.5px" data-editable="true">公式依據：據 <a href="https://www.gallup.com/workplace/247391/fixable-problem-costs-businesses-trillion.aspx" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">蓋洛普（Gallup）研究</a>，重置一位員工的成本約為其年薪的 0.5～2 倍（管理與專業職多落在高端）；本試算以保守偏高的 2 倍估算。</div>
    </div>
   </div>
  </div>
@@ -1318,4 +1327,6 @@ body.present #jte-thumbs{z-index:9985}
 })();
 </script>
 
+<style>.jte-cin{width:60px;padding:4px 6px;margin:0 2px;border:1px solid var(--border);border-radius:8px;background:#fff;font-size:16px;text-align:center;color:var(--blue);font-weight:600;font-variant-numeric:tabular-nums;-moz-appearance:textfield}.jte-cin::-webkit-outer-spin-button,.jte-cin::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}</style>
+<script>(function(){function num(id){var el=document.getElementById(id);if(!el)return 0;var v=parseFloat(el.value);return isNaN(v)?0:v;}function calc(){if(!document.getElementById('jte-ret'))return;var emp=num('jte-c-emp'),drop=num('jte-c-drop'),sal=num('jte-c-sal'),mult=num('jte-c-mult');var yr=Math.round(emp*(drop/100)*sal*mult*10000);var big=document.getElementById('jte-c-big');if(big)big.textContent='NT$ '+yr.toLocaleString('en-US');var sub=document.getElementById('jte-c-sub');if(sub)sub.textContent='三年累積約 NT$ '+(yr*3).toLocaleString('en-US');}document.addEventListener('input',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('jte-cin'))calc();});[300,1200,2600].forEach(function(t){setTimeout(calc,t);});})();</script>
 </body></html>
