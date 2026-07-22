@@ -765,11 +765,11 @@ body.present #jte-thumbs{z-index:9985}
  async function jteCloudLoad(){
    try{
      var r=await fetch('/api/deck',{cache:'no-store'});
-     if(!r.ok)return;
-     var j=await r.json();
-     if(j&&j.ok&&j.html&&typeof j.html==='string'&&j.html.length>50){
+     if(r.status===204||!r.ok)return;
+     var html=await r.text();
+     if(html&&html.length>50){
        var d=document.querySelector('.deck');
-       if(d){d.innerHTML=j.html;_jteLastSaved=j.html;}
+       if(d){d.innerHTML=html;_jteLastSaved=html;}
      }
    }catch(e){}
  }
@@ -780,11 +780,11 @@ body.present #jte-thumbs{z-index:9985}
    if(!manual&&html===_jteLastSaved)return;
    jteCloudStatus('☁ 存檔中…','wait');
    try{
-     var r=await fetch('/api/deck',{method:'POST',headers:{'content-type':'application/json','x-edit-key':JTE_EDIT},body:JSON.stringify({html:html})});
-     var j=await r.json();
+     var r=await fetch('/api/deck',{method:'POST',headers:{'content-type':'text/html; charset=utf-8','x-edit-key':JTE_EDIT},body:html});
+     var j={}; try{j=await r.json();}catch(e){}
      if(r.ok&&j.ok){_jteLastSaved=html;jteCloudStatus('☁ 已存雲端 '+(j.savedAt||'').slice(11,16),'ok');}
      else if(r.status===403){jteCloudStatus('⚠️ 密鑰錯了，沒存成','err');}
-     else{jteCloudStatus('⚠️ 存檔失敗','err');}
+     else{jteCloudStatus('⚠️ 存檔失敗 ('+r.status+')','err');}
    }catch(e){jteCloudStatus('⚠️ 連不上雲端','err');}
  }
  function jteCloudSaveDebounced(){if(!JTE_EDITMODE)return;clearTimeout(_jteSaveTimer);_jteSaveTimer=setTimeout(function(){jteCloudSave(false);},1500);}
