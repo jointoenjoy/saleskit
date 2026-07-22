@@ -36,7 +36,7 @@ body{padding:40px 0 120px}
 .part-tag{font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
 .part-tag.w{color:rgba(255,255,255,.55)}
 .pg{position:absolute;bottom:38px;right:64px;font-size:15px;font-weight:500;letter-spacing:.1em;color:var(--t3)}
-.jte-social{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:15px;font-weight:600;background:rgba(255,255,255,.12);padding:10px 18px;border-radius:26px;transition:background .2s}.jte-social:hover{background:rgba(255,255,255,.24)}.jte-social svg{width:19px;height:19px}#s19svc .sm{font-size:12px;line-height:1.5}#s19svc .flex>div>div[style*="background:var(--bg-gray)"]{margin-top:7px!important}
+.jte-social{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:15px;font-weight:600;background:rgba(255,255,255,.12);padding:10px 18px;border-radius:26px;transition:background .2s}.jte-social:hover{background:rgba(255,255,255,.24)}.jte-social svg{width:19px;height:19px}#s19svc .sm{font-size:12px;line-height:1.5}#s19svc span.sm[style*="font-weight:700"]{font-size:24px;line-height:1.2}#s19svc .flex>div>div[style*="background:var(--bg-gray)"]{margin-top:6px!important;padding:8px 14px!important}
 .pg.w{color:rgba(255,255,255,.5)}
 .blob{position:absolute;border-radius:50%;pointer-events:none}
 .dot{position:absolute;border-radius:50%}
@@ -489,29 +489,42 @@ body.present #jte-thumbs{z-index:9985}
  <div class="pg" data-editable="true">17</div></section><section class="slide" id="s14">
  <div class="s-head"><i class="logo"></i><span class="part-tag" data-editable="true">PART 03 · 策略與行動</span></div><div style="position:absolute;right:0;bottom:0;width:0;height:0;border-style:solid;border-width:0 0 220px 220px;border-color:transparent transparent rgba(168,201,238,.18) transparent;pointer-events:none"></div>
  <div class="pad" style="padding-top:108px">
-  <div class="titlebar"><h2 class="h2" style="font-size:30px" data-editable="true">員工福利投資思考矩陣</h2></div>
-  <p class="body" style="margin-top:8px;max-width:980px" data-editable="true">練息場落在「最優投資」象限 — 同時滿足員工有感與企業有據，是少數兼具體驗與數據追蹤的福利投資。</p>
-  <div style="position:relative;margin-top:12px">
-  <!-- top label -->
-  <div class="cap" style="text-align:center;font-weight:600;color:var(--t2);margin-bottom:8px" data-editable="true">↑ 企業高增效</div>
-  <div style="display:grid;grid-template-columns:1fr 64px 1fr;grid-template-rows:auto 40px auto;align-items:stretch">
-    <div style="grid-column:1;grid-row:1"><div style="background:#F7F8FA;border-radius:14px;padding:18px 20px"><div class="h3" style="font-size:17px;color:var(--text)" data-editable="true">轉型優化</div><div class="sm" style="color:var(--t2);margin:4px 0 10px" data-editable="true">有感但效益數據有限</div><div class="sm" style="color:var(--t2);line-height:1.6" data-editable="true">員工旅遊 / 出遊</div><div class="sm" style="color:var(--t2);line-height:1.6" data-editable="true">尾牙 / 慶生 / 抽獎</div><div class="sm" style="color:var(--t2);line-height:1.6" data-editable="true">生日禮 / 員購</div></div></div>
-    <div style="grid-column:3;grid-row:1"><div style="background:var(--blue);border-radius:14px;padding:18px 20px"><div class="h3" style="font-size:17px;color:#fff" data-editable="true">★ 最優投資</div><div class="sm" style="color:rgba(255,255,255,.85);margin:4px 0 10px" data-editable="true">員工有感 × 企業有據</div><div class="sm" style="color:rgba(255,255,255,.85);line-height:1.6" data-editable="true">練息場（Chill + Well）</div><div class="sm" style="color:rgba(255,255,255,.85);line-height:1.6" data-editable="true">運動健身 / 心理諮商補助</div><div class="sm" style="color:rgba(255,255,255,.85);line-height:1.6" data-editable="true">定期健康檢查（含心理）</div></div></div>
-    <!-- vertical axis -->
-    <div style="grid-column:2;grid-row:1/4;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative">
-      <div style="position:absolute;top:0;bottom:0;width:2px;background:var(--border)"></div>
-      <div style="width:12px;height:12px;border-radius:50%;background:var(--t3);z-index:1"></div>
+  <div class="titlebar"><h2 class="h2" style="font-size:30px" data-editable="true">福利投資光譜</h2></div>
+  <p class="body" style="margin-top:8px;max-width:980px" data-editable="true">從「做了卻沒感覺」到「有感又有據」。多數企業福利停在光譜前段，練息場站上頂端——員工當下有感，成效還能寫進 ESG 報告。</p>
+  <div style="display:flex;align-items:stretch;gap:22px;margin-top:30px">
+    <div style="flex:1;display:flex;flex-direction:column">
+     <div style="align-self:flex-start;background:#EEF1F5;color:var(--t2);font-size:13px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:12px" data-editable="true">有據 · 無感</div>
+     <div style="flex:1;background:#F7F8FA;border-radius:14px;padding:20px 22px;border:1px solid var(--border)">
+      <div class="h3" style="font-size:19px;color:var(--text)" data-editable="true">合規基礎</div>
+      <div class="sm" style="color:var(--t2);margin:6px 0 14px;line-height:1.6" data-editable="true">法定義務，員工多半視為理所當然。</div>
+      <div class="sm" style="color:var(--t2);line-height:2" data-editable="true">勞保 / 勞退 / 眷屬保險<br>員工協助方案 EAP</div>
+     </div>
     </div>
-    <!-- horizontal labels row -->
-    <div style="grid-column:1;grid-row:2;display:flex;align-items:center;justify-content:flex-end;padding-right:14px"><span class="cap" style="font-weight:600;color:var(--t2)" data-editable="true">員工低好感 ←</span></div>
-    <div style="grid-column:3;grid-row:2;display:flex;align-items:center;padding-left:14px"><span class="cap" style="font-weight:600;color:var(--green)" data-editable="true">→ 員工高好感</span></div>
-    <div style="grid-column:1;grid-row:3"><div style="background:#F7F8FA;border-radius:14px;padding:18px 20px"><div class="h3" style="font-size:17px;color:var(--text)" data-editable="true">精簡評估</div><div class="sm" style="color:var(--t2);margin:4px 0 10px" data-editable="true">低參與、低感知</div><div class="sm" style="color:var(--t2);line-height:1.6" data-editable="true">制式訓練課程（被動性）</div><div class="sm" style="color:var(--t2);line-height:1.6" data-editable="true">一次性團康（無追蹤數據）</div></div></div>
-    <div style="grid-column:3;grid-row:3"><div style="background:#ECF3EB;border-radius:14px;padding:18px 20px"><div class="h3" style="font-size:17px;color:var(--text)" data-editable="true">保留必要</div><div class="sm" style="color:var(--t2);margin:4px 0 10px" data-editable="true">合規基礎</div><div class="sm" style="color:var(--t2);line-height:1.6" data-editable="true">員工協助方案 EAP</div><div class="sm" style="color:var(--t2);line-height:1.6" data-editable="true">勞保 / 勞退 / 眷屬保險</div></div></div>
+    
+    <div style="flex:1;display:flex;flex-direction:column">
+     <div style="align-self:flex-start;background:#FBEFE2;color:#B4762A;font-size:13px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:12px" data-editable="true">有感 · 無據</div>
+     <div style="flex:1;background:#F7F8FA;border-radius:14px;padding:20px 22px;border:1px solid var(--border)">
+      <div class="h3" style="font-size:19px;color:var(--text)" data-editable="true">傳統福利</div>
+      <div class="sm" style="color:var(--t2);margin:6px 0 14px;line-height:1.6" data-editable="true">花錢有溫度，但成效難量化、留不下數據。</div>
+      <div class="sm" style="color:var(--t2);line-height:2" data-editable="true">尾牙 / 員工旅遊 / 生日禮<br>制式訓練 / 一次性團康</div>
+     </div>
+    </div>
+    
+    <div style="flex:1.08;display:flex;flex-direction:column">
+     <div style="align-self:flex-start;background:var(--blue);color:#fff;font-size:13px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:12px" data-editable="true">★ 有感 × 有據</div>
+     <div style="flex:1;background:var(--blue);border-radius:14px;padding:22px 24px;box-shadow:0 14px 30px rgba(0,61,124,.22)">
+      <div class="h3" style="font-size:20px;color:#fff" data-editable="true">練息場（Chill + Well）</div>
+      <div class="sm" style="color:rgba(255,255,255,.85);margin:6px 0 14px;line-height:1.6" data-editable="true">體驗當下有感，成效可追蹤，直接寫進 ESG。</div>
+      <div class="sm" style="color:rgba(255,255,255,.92);line-height:2" data-editable="true">聲療放鬆 / 呼吸調節（Chill）<br>心理測評 / 企業幸福報告（Well）</div>
+     </div>
+    </div>
+   </div>
+   <div style="margin-top:18px">
+    <div style="height:10px;border-radius:6px;background:linear-gradient(90deg,#E3E8EE 0%,#F3D9BC 50%,var(--blue) 100%)"></div>
+    <div style="text-align:right;margin-top:8px"><span class="cap" style="color:var(--t2);font-weight:600" data-editable="true">越往右，員工越有感、企業越有據 →</span></div>
+   </div>
   </div>
-  <div class="cap" style="text-align:center;font-weight:600;color:var(--t2);margin-top:8px" data-editable="true">企業低增效 ↓</div>
-</div>
- </div>
- <div class="pg" data-editable="true">18</div></section><section class="slide" id="s15">
+  <div class="pg" data-editable="true">18</div></section><section class="slide" id="s15">
  <div class="s-head"><i class="logo"></i><span class="part-tag" data-editable="true">PART 03 · 策略與行動</span></div><div style="position:absolute;right:0;bottom:0;width:0;height:0;border-style:solid;border-width:0 0 220px 220px;border-color:transparent transparent rgba(168,201,238,.18) transparent;pointer-events:none"></div>
  <div class="pad" style="padding-top:118px">
   <div class="eyebrow" data-editable="true">REDEFINING RETENTION</div>
