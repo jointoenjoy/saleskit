@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chill Saleskit 後台</title>
+<link rel="icon" href="/chill/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#003D7C;--blue-deep:#002850;--blue-soft:#A8C9EE;--green:#4CAF19;--red:#E2574C;
+ --bg:#F2F4F7;--border:rgba(0,61,124,.12);--text:#0A1929;--t2:#4A5A6E;--t3:#8A95A5}
+html,body{height:100%}
+body{font-family:'Inter','Noto Sans TC','PingFang TC',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;
+ color:var(--text);background:var(--bg);display:flex;flex-direction:column}
+
+/* 登入 */
+#login{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--bg);z-index:50}
+#login.on{display:flex}
+.lbox{background:#fff;border-radius:18px;padding:40px;width:380px;box-shadow:0 16px 60px rgba(0,61,124,.14)}
+.lbox img{height:52px;display:block;margin-bottom:22px}
+.lbox h1{font-size:21px;font-weight:700;letter-spacing:-.02em}
+.lbox p{font-size:13.5px;color:var(--t2);margin-top:8px;line-height:1.6}
+input[type=password],input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:9px;
+ font-size:14px;font-family:inherit;margin-top:18px;background:#fff}
+input:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:transparent}
+.err{color:var(--red);font-size:13px;margin-top:10px;display:none}
+.err.on{display:block}
+
+/* 工具列 */
+.bar{height:58px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;
+ gap:10px;padding:0 18px;flex:none;position:relative;z-index:20}
+.bar img{height:30px}
+.bar .sp{flex:1}
+.btn{height:38px;border-radius:9px;border:none;padding:0 16px;font-size:13.5px;font-weight:600;font-family:inherit;
+ cursor:pointer;display:inline-flex;align-items:center;gap:7px;background:transparent;color:var(--blue);transition:background .15s}
+.btn:hover{background:rgba(0,61,124,.08)}
+.btn.pri{background:var(--blue);color:#fff}.btn.pri:hover{background:var(--blue-deep)}
+.btn.ok{background:var(--green);color:#fff}
+.btn.ghost{color:var(--t2)}
+.btn:disabled{opacity:.42;cursor:default}
+.tog{display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:var(--t2);
+ padding:0 14px;height:38px;border-radius:9px;background:#F2F4F7;cursor:pointer;user-select:none}
+.tog input{display:none}
+.tog .sw{width:38px;height:22px;border-radius:12px;background:#CBD3DD;position:relative;transition:background .18s}
+.tog .sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .18s}
+.tog input:checked+.sw{background:var(--green)}
+.tog input:checked+.sw::after{transform:translateX(16px)}
+.state{font-size:12.5px;color:var(--t3);letter-spacing:.02em}
+.state.dirty{color:var(--red);font-weight:600}
+.state.saved{color:var(--green);font-weight:600}
+
+/* 預覽 */
+.wrap{flex:1;overflow:auto;background:#e9edf2}
+iframe{width:100%;height:100%;border:none;display:block}
+
+/* 圖片挑選 */
+#pick{position:fixed;inset:0;background:rgba(6,15,26,.6);display:none;align-items:center;justify-content:center;z-index:60}
+#pick.on{display:flex}
+.pbox{background:#fff;border-radius:18px;width:min(980px,92vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;
+ box-shadow:0 24px 70px rgba(0,0,0,.34)}
+.phead{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.phead h2{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.phead .k{font-size:12px;color:var(--t3);font-family:ui-monospace,Menlo,monospace}
+.tabs{display:flex;gap:4px;background:#F2F4F7;padding:4px;border-radius:9px;margin:16px 24px 0}
+.tab{flex:1;height:34px;border:none;background:transparent;border-radius:7px;font-size:13px;font-weight:600;
+ font-family:inherit;color:var(--t2);cursor:pointer}
+.tab.on{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(0,61,124,.1)}
+.pbody{padding:18px 24px 24px;overflow:auto;flex:1}
+.drop{border:2px dashed rgba(0,61,124,.25);border-radius:14px;padding:44px;text-align:center;color:var(--t2);font-size:14px;cursor:pointer}
+.drop.over{border-color:var(--blue);background:rgba(0,61,124,.05)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:9px}
+.grid figure{margin:0;border-radius:9px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;border:2px solid transparent;background:#dde3ea}
+.grid figure:hover{border-color:var(--blue)}
+.grid img{width:100%;height:100%;object-fit:cover;display:block}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{border:1px solid var(--border);background:#fff;border-radius:20px;padding:6px 13px;font-size:12.5px;font-weight:600;
+ color:var(--t2);cursor:pointer;font-family:inherit}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.pfoot{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:9px}
+.hint{font-size:12.5px;color:var(--t3);margin-top:12px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div id="login" class="on">
+  <form class="lbox" id="loginForm">
+    <img src="/chill/logo.png" alt="練息場">
+    <h1>Chill Saleskit 後台</h1>
+    <p>登入後可直接在預覽上改字、換圖，儲存後前台立即更新。</p>
+    <input type="password" id="pw" placeholder="管理密碼" autocomplete="current-password" required>
+    <div class="err" id="loginErr">密碼不正確</div>
+    <button class="btn pri" style="width:100%;justify-content:center;margin-top:16px;height:44px" type="submit">登入</button>
+  </form>
+</div>
+
+<div class="bar">
+  <img src="/chill/logo.png" alt="練息場">
+  <strong style="font-size:14.5px;letter-spacing:-.01em">Chill Saleskit</strong>
+  <label class="tog"><input type="checkbox" id="editTog"><span class="sw"></span>編輯模式</label>
+  <span class="state" id="state">已是最新</span>
+  <span class="sp"></span>
+  <a class="btn ghost" href="/chill" target="_blank" rel="noopener">開啟前台 ↗</a>
+  <button class="btn ghost" id="btnReset">還原預設</button>
+  <button class="btn pri" id="btnSave" disabled>儲存並發布</button>
+  <button class="btn ghost" id="btnLogout">登出</button>
+</div>
+
+<div class="wrap"><iframe id="fr" src="/chill"></iframe></div>
+
+<div id="pick">
+  <div class="pbox">
+    <div class="phead"><h2>換一張圖</h2><span class="k" id="pickKey"></span></div>
+    <div class="tabs">
+      <button class="tab on" data-tab="lib">活動照片庫</button>
+      <button class="tab" data-tab="up">上傳新圖</button>
+      <button class="tab" data-tab="url">貼圖片網址</button>
+    </div>
+    <div class="pbody">
+      <div data-pane="lib">
+        <div class="filters" id="libFilters"></div>
+        <div class="grid" id="libGrid"></div>
+      </div>
+      <div data-pane="up" hidden>
+        <div class="drop" id="drop">把圖片拖到這裡，或點一下選擇檔案<br><span style="font-size:12.5px;color:var(--t3)">上傳時會自動壓縮到寬 1800px，JPEG</span></div>
+        <input type="file" id="file" accept="image/*" hidden>
+        <div class="hint" id="upHint"></div>
+      </div>
+      <div data-pane="url" hidden>
+        <input type="text" id="urlIn" placeholder="https://…" style="margin-top:0">
+        <div class="hint">貼上任何可公開存取的圖片網址。</div>
+      </div>
+    </div>
+    <div class="pfoot">
+      <button class="btn ghost" id="pickCancel">取消</button>
+      <button class="btn pri" id="pickApply">套用</button>
+    </div>
+  </div>
+</div>
+
+<script src="/chill/data.js"></script>
+<script src="/chill/mng/mng.js"></script>
+</body>
+</html>

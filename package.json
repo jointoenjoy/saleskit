@@ -1,0 +1,14 @@
+{
+  "name": "chill-saleskit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "練息場 Chill Saleskit — 五感策展級企業體驗簡報（含 /chill/mng 後台）",
+  "scripts": {
+    "dev": "wrangler dev --port 8788",
+    "deploy": "wrangler deploy",
+    "kv:create": "wrangler kv namespace create chill_content"
+  },
+  "devDependencies": {
+    "wrangler": "^4.42.0"
+  }
+}

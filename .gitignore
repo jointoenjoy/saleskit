@@ -1,3 +1,6 @@
 dist/
 .wrangler/
 .editkey.txt
+node_modules/
+.dev.vars
+.DS_Store
