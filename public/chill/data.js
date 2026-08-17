@@ -1,6 +1,6 @@
 /* 練息場 Chill Saleskit — 資料層
    課程清單來源：Wix 報名系統匯出（wix_status，2025/01–2026/08，共 34 場）
-   照片來源：Google Drive 2026 活動紀錄／專業側拍 無 logo 版，依 2025 選圖準則挑選
+   照片來源：Google Drive 活動紀錄／專業側拍 無 logo 版，依 2025 選圖準則挑選
    數據來源：2026 上半年 Chill 活動前後測問卷（有效樣本 156 份）＋ 年度合約進度表        */
 
 /* ── 五感策展分類 ─────────────────────────────── */
@@ -58,12 +58,14 @@ const COURSES = [
 ];
 
 /* ── 滿版照片頁 ────────────────────────────────
-   每頁一種主題，對應 2025 選圖準則的六個面向                    */
+   每頁一種主題，對應 2025 選圖準則的六個面向。
+   imgs 張數要對得上版位容量（見 deck.js 的 LAYOUT_CAP），多的會被截掉，
+   少的會留空格 —— 這是 p6 之前破圖的原因。                        */
 const PHOTO_PAGES = {
   venue: {
     layout: 'm-hero', badge: 'THE PLACE',
     title: '場域，本身就是內容',
-    sub: '老屋木構、林間草地、窗邊的光。我們挑的不是會議室，是一走進去就會自動慢下來的地方。',
+    sub: '老屋木構、林間草地、挑高展演廳、山上的茶屋。我們挑一走進去就會自動慢下來的地方。',
     imgs: [
       'moss0731/venue-0006.jpg', 'tree/venue-0007.jpg', 'sound/venue-0007.jpg',
       'moss0731/venue-0243.jpg', 'tree/venue-0123.jpg',
@@ -72,20 +74,19 @@ const PHOTO_PAGES = {
   scene: {
     layout: 'm-wide', badge: 'THE ATMOSPHERE',
     title: '一場活動的體感密度',
-    sub: '從 25 人的樹梢，到 100 人的滿場。同一件事，所有人一起做——這是線上課給不了的現場。',
+    sub: '從 25 人的樹梢，到 50＋人的躺躺音樂會滿場。同一件事，所有人一起做——這是線上課給不了的現場。',
     imgs: [
-      'moss0730/scene-0134.jpg', 'sound/scene-0031.jpg', 'tree/scene-0033.jpg',
-      'moss0731/scene-0012.jpg', 'ride0320/scene-0008.jpg', 'sound/scene-0061.jpg',
-      'moss0730/scene-0119.jpg',
+      'moss0730/scene-0134.jpg', 'tree/scene-0122.jpg', 'sound/scene-0031.jpg',
+      'ride0320/scene-0008.jpg', 'moss0731/scene-0012.jpg',
     ],
   },
   face: {
     layout: 'm-3x2', badge: 'THE PEOPLE',
-    title: '你要的滿意度，長這個樣子',
-    sub: '不是問卷上的分數，是當下的表情。閉上的眼睛、笑到瞇起來的眼角、捧著作品捨不得放下的手。',
+    title: '員工滿意度，從他們臉上看得見',
+    sub: '閉上的眼睛、笑到瞇起來的眼角、捧著作品捨不得放下的手。問卷上的分數，在現場長這個樣子。',
     imgs: [
-      'moss0731/face-0203.jpg', 'ride0320/face-0016.jpg', 'tree/face-0108.jpg',
-      'moss0730/face-0110.jpg', 'moss0731/face-0245.jpg', 'sound/face-0026.jpg',
+      'moss0731/face-0203.jpg', 'ride0320/face-0097.jpg', 'tree/face-0108.jpg',
+      'moss0730/face-0110.jpg', 'moss0731/face-0245.jpg', 'moss0717/scene-0055.jpg',
     ],
   },
   detail: {
@@ -103,8 +104,8 @@ const PHOTO_PAGES = {
     title: '找的是那個領域裡真的在做的人',
     sub: '樹藝師、聲療師、茶人、植物職人、正念導師、馬術教練。帶領者專業度平均 9.25／10。',
     imgs: [
-      'sound/teacher-0093.jpg', 'moss0730/teacher-0017.jpg', 'tree/teacher-0001.jpg',
-      'moss0731/teacher-0237.jpg', 'ride0327/teacher-0104.jpg', 'moss0717/teacher-0002.jpg',
+      'sound/teacher-0093.jpg', 'tree/teacher-0001.jpg', 'moss0730/teacher-0012.jpg',
+      'moss0730/teacher-0121.jpg', 'moss0731/teacher-0128.jpg', 'moss0730/teacher-0031.jpg',
     ],
   },
   group: {
@@ -118,20 +119,4 @@ const PHOTO_PAGES = {
   },
 };
 
-/* ── 2026 年度排程（合約 14 場）───────────────── */
-const PLAN = [
-  { m: '3月',  n: '春野・開運・馬上好', c: '馬術 · 100 名額', done: true  },
-  { m: '4月',  n: '漫步在樹梢',         c: '攀樹 · 25 名額',  done: true  },
-  { m: '5月',  n: '啟動身體原廠設定',   c: '經絡 · 50 名額',  done: true  },
-  { m: '6月',  n: '鬆鬆在・小滿茶席',   c: '茶席 · 40 名額',  done: true  },
-  { m: '7月',  n: '聲波共振・苔球',     c: '聲療＋手作 · 100', done: true },
-  { m: '8月',  n: '香料野草茶',         c: '食療 · 40 名額',  done: false },
-  { m: '9月',  n: '正念冥想',           c: '心智 · 25 名額',  done: false },
-  { m: '10月', n: '弓道射箭',           c: '體感 · 50 名額',  done: false },
-  { m: '11月', n: '節氣食療',           c: '味覺 · 50 名額',  done: false },
-  { m: '12月', n: '森林療癒',           c: '自然 · 40 名額',  done: false },
-  { m: '1月',  n: '躺躺音樂會',         c: '聲療 · 50 名額',  done: false },
-  { m: '2月',  n: '年度回顧活動',       c: '總結 · 25 名額',  done: false },
-];
-
-window.CHILL_DATA = { SENSES, COURSES, PHOTO_PAGES, PLAN };
+window.CHILL_DATA = { SENSES, COURSES, PHOTO_PAGES };

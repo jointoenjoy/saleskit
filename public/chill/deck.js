@@ -10,15 +10,15 @@
 
   /* ---------- 1. 動態區塊 ---------- */
 
+  // 版位容量：grid 放得下幾張圖。超過的會溢出成破圖，所以在這裡截斷。
+  var LAYOUT_CAP = { 'm-hero': 5, 'm-wide': 5, 'm-3x2': 6, 'm-tall': 5, 'm-strip': 4 };
+
   function renderSenses() {
     var el = document.getElementById('senseGrid');
     if (!el) return;
-    var counts = {};
-    D.COURSES.forEach(function (c) { counts[c.s] = (counts[c.s] || 0) + 1; });
-    el.innerHTML = D.SENSES.map(function (s, i) {
+    el.innerHTML = D.SENSES.map(function (s) {
       return '<div class="sense" style="--c:' + s.color + '">' +
         '<span style="position:absolute;top:0;left:0;right:0;height:4px;background:' + s.color + '"></span>' +
-        '<div class="num" data-edit="sense.' + s.key + '.n">' + (counts[s.key] || 0) + '</div>' +
         '<div class="k" data-edit="sense.' + s.key + '.k">' + s.ko + '</div>' +
         '<div class="t" data-edit="sense.' + s.key + '.t">' + s.name + '</div>' +
         '<div class="c" data-edit="sense.' + s.key + '.c">' + s.desc + '</div>' +
@@ -45,24 +45,13 @@
     }).join('');
   }
 
-  function renderPlan() {
-    var el = document.getElementById('planGrid');
-    if (!el) return;
-    el.innerHTML = D.PLAN.map(function (p, i) {
-      return '<div class="m' + (p.done ? ' done' : '') + '">' +
-        '<div class="mm" data-edit="plan.' + i + '.m">' + p.m + '</div>' +
-        '<div class="nm" data-edit="plan.' + i + '.n">' + p.n + '</div>' +
-        '<div class="cap2" data-edit="plan.' + i + '.c">' + p.c + '</div>' +
-        '</div>';
-    }).join('');
-  }
-
   function renderPhotoPages() {
     Object.keys(D.PHOTO_PAGES).forEach(function (key) {
       var sec = document.querySelector('.slide.photo[data-photo="' + key + '"]');
       if (!sec) return;
       var p = D.PHOTO_PAGES[key];
-      var figs = p.imgs.map(function (src, i) {
+      var cap = LAYOUT_CAP[p.layout] || p.imgs.length;
+      var figs = p.imgs.slice(0, cap).map(function (src, i) {
         return '<figure data-img-wrap data-img="photo.' + key + '.' + i + '">' +
           '<img loading="lazy" src="/assets/photos/' + src + '" alt="">' +
           '</figure>';
@@ -181,7 +170,6 @@
   /* ---------- 啟動 ---------- */
   renderSenses();
   renderWall();
-  renderPlan();
   renderPhotoPages();
   loadContent().then(function () {
     post({ type: 'ready', slides: document.querySelectorAll('.slide').length });
