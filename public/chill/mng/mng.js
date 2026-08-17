@@ -10,14 +10,14 @@
   /* ---------- 登入 ---------- */
   function setLogin(on) { $('#login').classList.toggle('on', on); }
 
-  fetch('/api/me').then(function (r) { return r.json(); })
+  fetch('/api/chill/me').then(function (r) { return r.json(); })
     .then(function (j) { setLogin(!j.ok); })
     .catch(function () { setLogin(true); });
 
   $('#loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
     $('#loginErr').classList.remove('on');
-    fetch('/api/login', {
+    fetch('/api/chill/login', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: $('#pw').value })
     }).then(function (r) {
@@ -27,7 +27,7 @@
   });
 
   $('#btnLogout').addEventListener('click', function () {
-    fetch('/api/logout', { method: 'POST' }).then(function () { setLogin(true); });
+    fetch('/api/chill/logout', { method: 'POST' }).then(function () { setLogin(true); });
   });
 
   /* ---------- 編輯模式 ---------- */
@@ -70,7 +70,7 @@
   });
 
   function doSave(text, images) {
-    fetch('/api/content', {
+    fetch('/api/chill/content', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text, images: Object.assign({}, pending.images, images || {}) })
     }).then(function (r) {
@@ -99,7 +99,7 @@
       return;
     }
     disarmReset();
-    fetch('/api/content', { method: 'DELETE' }).then(function (r) {
+    fetch('/api/chill/content', { method: 'DELETE' }).then(function (r) {
       if (r.status === 401) { setLogin(true); return; }
       dirty = false; pending = { text: {}, images: {} };
       $('#btnSave').disabled = true;
@@ -202,7 +202,7 @@
   function handleFile(file) {
     $('#upHint').textContent = '處理中…';
     compress(file, 1800, 0.82).then(function (blob) {
-      return fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'image/jpeg' }, body: blob });
+      return fetch('/api/chill/upload', { method: 'POST', headers: { 'Content-Type': 'image/jpeg' }, body: blob });
     }).then(function (r) {
       if (r.status === 401) { setLogin(true); throw new Error('unauth'); }
       return r.json();

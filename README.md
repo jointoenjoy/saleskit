@@ -34,9 +34,14 @@ public/
       index.html    後台介面
       mng.js        登入、即時編輯、換圖、儲存發布
   assets/photos/    164 張活動照片 + manifest.json
-worker/src/index.js Cloudflare Worker（只處理 /api/*）
-wrangler.jsonc      Worker 設定
+functions/
+  api/deck.js           舊版簡報的雲端存檔 API（/api/deck）
+  api/chill/[[path]].js Chill 版後台 API（/api/chill/*）
+build.sh            產生 dist/：舊版 → /2026、public/ → 網站根目錄、functions 一起帶上
+wrangler.toml       Pages 專案設定（DECK_KV 綁定）
 ```
+
+前後台共用同一個 Pages 專案，API 走 Pages Functions，沒有獨立的 Worker。
 
 ### 後台怎麼運作
 
@@ -52,35 +57,30 @@ wrangler.jsonc      Worker 設定
 
 ```bash
 npm install
-cp .dev.vars.example .dev.vars   # 填入 ADMIN_PASSWORD / SESSION_SECRET
-npm run dev                      # http://localhost:8788/chill
+cp .dev.vars.example .dev.vars   # 填入 EDIT_KEY（後台密碼，同時當簽章金鑰）
+npm run dev                      # 會先跑 build.sh，再開 http://localhost:8788/chill
 ```
 
 ### 部署到 Cloudflare
 
-第一次部署要做四件事：
+Pages 專案名 `saleskit`，KV namespace `DECK_KV` 已建好（id 寫在 `wrangler.toml`）。
 
 ```bash
-# 1. 登入（互動式，需要在終端機手動執行）
-npx wrangler login
-
-# 2. 建 KV namespace，把回傳的 id 填進 wrangler.jsonc 的 kv_namespaces[0].id
-npm run kv:create
-
-# 3. 設定密碼與簽章金鑰
-npx wrangler secret put ADMIN_PASSWORD
-npx wrangler secret put SESSION_SECRET
-
-# 4. 部署
-npm run deploy
+npx wrangler login     # 只有第一次或 token 過期時要跑，互動式
+npm run deploy         # = ./build.sh && wrangler pages deploy dist --project-name=saleskit
 ```
 
-之後每次更新只要 `npm run deploy`。
+後台密碼存在 Pages 環境變數 `EDIT_KEY`（Chill 後台登入與 session 簽章共用同一把）：
+
+```bash
+npx wrangler pages secret put EDIT_KEY --project-name saleskit
+```
 
 上線後網址：
 
-- 前台 `https://chill-saleskit.<你的帳號>.workers.dev/chill`
-- 後台 `https://chill-saleskit.<你的帳號>.workers.dev/chill/mng`
+- 舊版簡報 `/2026`（根目錄 `/` 會 302 導過去）
+- Chill 前台 `/chill`
+- Chill 後台 `/chill/mng`
 
 ### 待辦
 

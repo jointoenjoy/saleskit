@@ -1,2 +1,1 @@
-ADMIN_PASSWORD=請改成你要的密碼
-SESSION_SECRET=請改成一串隨機字串
+EDIT_KEY=請改成後台登入密碼（同時當 session 簽章金鑰）

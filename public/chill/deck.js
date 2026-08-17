@@ -100,7 +100,7 @@
   function cssEsc(s) { return String(s).replace(/"/g, '\\"'); }
 
   function loadContent() {
-    return fetch('/api/content', { cache: 'no-store' })
+    return fetch('/api/chill/content', { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) { applyOverrides(j); return j; })
       .catch(function () { return null; });
