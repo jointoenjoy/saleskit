@@ -770,13 +770,14 @@ body.present #jte-thumbs{z-index:9985}
 <div id="jte-dock">
   <button class="dock-btn active" id="penToggle" title="編輯工具"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></button>
   <div class="dock-tools open" id="dockTools">
-    <button class="jte-tool-btn" id="jt-ppt" onclick="jtePPT()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg>PPT</button>
     <button class="jte-tool-btn" onclick="jteSave()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"></path><path d="M8 4v5h7"></path><path d="M8 14h8v6H8z"></path></svg>HTML</button>
   </div>
   <div class="dock-sep"></div>
   <button class="dock-btn" onclick="jteNav(-1)" title="上一頁">‹</button>
   <span id="dockPg">1 / 23</span>
   <button class="dock-btn" onclick="jteNav(1)" title="下一頁">›</button>
+  <div class="dock-sep"></div>
+  <button class="dock-btn" id="dockPPT" onclick="jtePPT()" title="下載 PPT（文字可改、圖片可換，版面不變）" aria-label="下載可編輯 PPT"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg></button>
   <div class="dock-sep"></div>
   <button class="dock-btn" onclick="jteThumbs()" title="全部縮圖">⊞</button>
   <button class="dock-btn" onclick="jteFull()" title="滿版簡報模式">⛶</button>
@@ -1027,14 +1028,14 @@ body.present #jte-thumbs{z-index:9985}
        const t=el.innerText.trim();if(!t)return;
        seen.add(el);
        const cs=getComputedStyle(el);const r=relRect(el,slide);
-       // 有實心底色（藍/黃膠囊等）→ 整顆「連字帶底」烤進背景，不另外疊字，
-       // 避免疊字與膠囊對不齊或偏移（這類小標籤極少需要改字）。
-       const bgHex=rgbToHex(cs.backgroundColor);
-       const baked=!!bgHex;
+       // 用「內容框」（扣掉 padding）定位疊字：膠囊標籤內距大，靠內容框才會落在膠囊正中，
+       // 不會像 html2canvas 把膠囊裡的字畫歪、畫出界。
+       const pL=parseFloat(cs.paddingLeft)||0, pR=parseFloat(cs.paddingRight)||0;
+       const pT=parseFloat(cs.paddingTop)||0, pB=parseFloat(cs.paddingBottom)||0;
        // 讀取 HTML 實際斷行的每一行，組成帶換行的字串 → PPT 照排，斷行與 HTML 一致。
        const lns=wrappedLines(el);
-       out.push({text:lns.join('\n'), el, baked, singleLine:lns.length<=1,
-         x:r.x,y:r.y,w:r.w,h:r.h,
+       out.push({text:lns.join('\n'), el, singleLine:lns.length<=1,
+         x:r.x+pL,y:r.y+pT,w:Math.max(1,r.w-pL-pR),h:Math.max(1,r.h-pT-pB),
          fontSize:Math.max(8,Math.round(parseFloat(cs.fontSize)*0.78)),
          bold:parseInt(cs.fontWeight)>=600,
          color:rgbToHex(cs.color)||'333333',
@@ -1055,6 +1056,44 @@ body.present #jte-thumbs{z-index:9985}
          opx:px, opy:py, radius:br});
      });
      return out;
+   }
+   // html2canvas 不支援 conic-gradient（p21 的圓餅圖會整個不見）→ 匯出前用 canvas 畫成同尺寸點陣圖暫時替換
+   function conicToDataURL(el,cs){
+     const bg=cs.backgroundImage||''; const i=bg.indexOf('conic-gradient(');
+     if(i<0) return null;
+     let dep=0,start=i+'conic-gradient('.length,end=-1;
+     for(let k=start;k<bg.length;k++){const c=bg[k];if(c==='(')dep++;else if(c===')'){if(dep===0){end=k;break;}dep--;}}
+     if(end<0) return null;
+     const parts=[];let cur='',d2=0;
+     for(const c of bg.slice(start,end)){if(c==='(')d2++;if(c===')')d2--;if(c===','&&d2===0){parts.push(cur);cur='';}else cur+=c;}
+     parts.push(cur);
+     const toDeg=v=>{const n=parseFloat(v);if(v.indexOf('%')>=0)return n*3.6;if(v.indexOf('turn')>=0)return n*360;if(v.indexOf('grad')>=0)return n*0.9;if(/rad$/.test(v))return n*180/Math.PI;return n;};
+     const flat=[];
+     parts.forEach(ptxt=>{
+       ptxt=ptxt.trim(); if(!ptxt||/^(from|at)\b/.test(ptxt))return;
+       const cm=ptxt.match(/^(rgba?\([^)]*\)|#[0-9a-fA-F]+|[a-zA-Z]+)\s*(.*)$/);
+       if(!cm)return;
+       const pos=(cm[2].match(/-?[\d.]+(?:deg|%|turn|grad|rad)?/g)||[]);
+       if(!pos.length) flat.push({c:cm[1],p:null});
+       else pos.forEach(v=>flat.push({c:cm[1],p:toDeg(v)}));
+     });
+     if(!flat.length) return null;
+     if(flat[0].p==null) flat[0].p=0;
+     let last=0;
+     flat.forEach(st=>{ if(st.p==null) st.p=last; st.p=Math.min(360,Math.max(last,st.p)); last=st.p; });
+     if(flat[0].p>0) flat.unshift({c:flat[0].c,p:0});
+     if(flat[flat.length-1].p<360) flat.push({c:flat[flat.length-1].c,p:360});
+     const r=el.getBoundingClientRect();
+     const q=3, w=Math.max(1,Math.round(r.width*q)), h=Math.max(1,Math.round(r.height*q));
+     const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+     const ctx=cv.getContext('2d');
+     try{
+       const g=ctx.createConicGradient(-Math.PI/2,w/2,h/2);
+       flat.forEach(st=>{ try{ g.addColorStop(Math.min(1,Math.max(0,st.p/360)), st.c); }catch(e){} });
+       ctx.fillStyle=g;
+     }catch(e){ ctx.fillStyle=flat[0].c; }
+     ctx.fillRect(0,0,w,h);
+     try{ return cv.toDataURL('image/png'); }catch(e){ return null; }
    }
    // 抓 logo 元素位置（background-image），之後用原始高解析 PNG 清晰疊上，避免被 JPEG 背景壓糊
    function collectLogos(slide){
@@ -1087,12 +1126,23 @@ body.present #jte-thumbs{z-index:9985}
        //    - 已填圖片：整個隱藏，之後用裁切畫面精準疊回。
        const hidden=[];
        texts.forEach(t=>{
-         if(t.baked) return; // 膠囊不藏，完整烤進背景
-         const el=t.el;
-         hidden.push([el,el.style.color,el.style.textShadow,el.style.webkitTextFillColor]);
-         el.style.color='transparent';
-         el.style.textShadow='none';
-         el.style.webkitTextFillColor='transparent';
+         // 連子層一起藏：段落裡自帶顏色的 <a> 連結不藏就會殘在背景，跟疊回來的字重疊
+         [t.el,...t.el.querySelectorAll('*')].forEach(el=>{
+           hidden.push([el,el.style.color,el.style.textShadow,el.style.webkitTextFillColor]);
+           el.style.color='transparent';
+           el.style.textShadow='none';
+           el.style.webkitTextFillColor='transparent';
+         });
+       });
+       // conic-gradient（圓餅圖）html2canvas 不支援會整個消失 → 先畫成點陣圖暫時替換
+       const conicSwap=[];
+       sl.querySelectorAll('*').forEach(el=>{
+         const cs2=getComputedStyle(el);
+         if((cs2.backgroundImage||'').indexOf('conic-gradient')<0) return;
+         const du=conicToDataURL(el,cs2); if(!du) return;
+         conicSwap.push([el,el.style.backgroundImage,el.style.backgroundSize]);
+         el.style.backgroundImage='url('+du+')';
+         el.style.backgroundSize='100% 100%';
        });
        const imgHidden=[];
        imgs.forEach(im=>{imgHidden.push([im.el,im.el.style.visibility]);im.el.style.visibility='hidden';});
@@ -1104,6 +1154,7 @@ body.present #jte-thumbs{z-index:9985}
        }finally{
          hidden.forEach(([el,c,ts,wf])=>{el.style.color=c;el.style.textShadow=ts;el.style.webkitTextFillColor=wf;});
          imgHidden.forEach(([el,v])=>{el.style.visibility=v;});
+         conicSwap.forEach(([el,bi,bs])=>{el.style.backgroundImage=bi;el.style.backgroundSize=bs;});
        }
        // 2. 已填圖片：自己用 canvas 依 object-fit:cover ＋ object-position 精準裁切，
        //    （html2canvas 不支援 object-fit 會把圖拉伸壓窄，故改手算）。保留圓角，輸出 PNG 帶透明角。
@@ -1154,7 +1205,6 @@ body.present #jte-thumbs{z-index:9985}
        // 4. 疊上可改字（膠囊已烤進背景，這裡跳過）。文字已帶 HTML 實際斷行，
        //    用 wrap:false 照排 → 斷行與 HTML 一致、永不自己掉字。框置中對齊元素。
        texts.forEach(t=>{
-         if(t.baked) return;
          const extra = t.singleLine ? 1.4 : 0.5;
          let x = X(t.x)-0.04;
          if(t.align==='center') x -= extra/2;
