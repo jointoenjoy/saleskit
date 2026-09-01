@@ -11,7 +11,7 @@
   /* ---------- 1. 動態區塊 ---------- */
 
   // 版位容量：grid 放得下幾張圖。超過的會溢出成破圖，所以在這裡截斷。
-  var LAYOUT_CAP = { 'm-hero': 5, 'm-wide': 5, 'm-3x2': 6, 'm-tall': 5, 'm-strip': 4 };
+  var LAYOUT_CAP = { 'm-hero': 5, 'm-wide': 5, 'm-3x2': 6, 'm-4x2': 8, 'm-tall': 5, 'm-strip': 4 };
 
   function renderSenses() {
     var el = document.getElementById('senseGrid');
@@ -28,17 +28,14 @@
 
   function renderWall() {
     var wall = document.getElementById('courseWall');
-    var leg = document.getElementById('wallLegend');
     if (!wall) return;
-    var counts = {};
-    D.COURSES.forEach(function (c) { counts[c.s] = (counts[c.s] || 0) + 1; });
-    leg.innerHTML = D.SENSES.map(function (s) {
-      return '<span><i style="background:' + s.color + '"></i>' + s.name.split('・')[1] +
-        ' <b style="color:' + s.color + '">' + (counts[s.key] || 0) + '</b></span>';
-    }).join('');
+    var currentYear = '';
     wall.innerHTML = D.COURSES.map(function (c, i) {
       var s = senseByKey[c.s] || { color: '#8A95A5' };
-      return '<div class="course"><i style="background:' + s.color + '"></i><div>' +
+      var year = String(c.d).slice(0, 4);
+      var divider = year !== currentYear ? '<div class="course-year"><span>' + year + '</span></div>' : '';
+      currentYear = year;
+      return divider + '<div class="course"><i style="background:' + s.color + '"></i><div>' +
         '<div class="n" data-edit="course.' + i + '.n">' + c.n + '</div>' +
         '<div class="d" data-edit="course.' + i + '.d">' + c.d + '</div>' +
         '</div></div>';
@@ -59,13 +56,18 @@
       var pg = sec.querySelector('.pg');
       sec.insertAdjacentHTML('afterbegin',
         '<div class="mosaic ' + p.layout + '">' + figs + '</div>' +
-        '<div class="photo-tag"><span class="logo-chip"><i class="logo"></i></span>' +
-        '<span class="photo-badge" data-edit="photo.' + key + '.badge">' + p.badge + '</span></div>' +
         '<div class="photo-cap">' +
         '<h2 class="h1 w" style="font-size:40px;max-width:900px" data-edit="photo.' + key + '.title">' + p.title + '</h2>' +
         '<p class="body wt" style="margin-top:12px;max-width:820px;color:rgba(255,255,255,.8)" data-edit="photo.' + key + '.sub">' + p.sub + '</p>' +
         '</div>');
       if (pg) sec.appendChild(pg);
+    });
+  }
+
+  function renumberSlides() {
+    document.querySelectorAll('.slide').forEach(function (slide, i) {
+      var pg = slide.querySelector('.pg');
+      if (pg) pg.textContent = String(i + 1).padStart(2, '0');
     });
   }
 
@@ -193,8 +195,10 @@
   renderSenses();
   renderWall();
   renderPhotoPages();
+  renumberSlides();
   renderRoi();
   loadContent().then(function () {
+    renumberSlides();
     post({ type: 'ready', slides: document.querySelectorAll('.slide').length });
   });
 })();
