@@ -191,12 +191,148 @@
     calc();
   }
 
+  /* ---------- 5. 手機橫式全螢幕播放 ---------- */
+
+  var present = { on: false, index: 0, touchX: 0 };
+
+  function slides() { return Array.prototype.slice.call(document.querySelectorAll('.slide')); }
+
+  function nearestSlideIndex() {
+    var list = slides();
+    var center = window.scrollY + window.innerHeight / 2;
+    var best = 0;
+    var bestDist = Infinity;
+    list.forEach(function (s, i) {
+      var rect = s.getBoundingClientRect();
+      var mid = window.scrollY + rect.top + rect.height / 2;
+      var dist = Math.abs(center - mid);
+      if (dist < bestDist) { best = i; bestDist = dist; }
+    });
+    return best;
+  }
+
+  function layoutPresent() {
+    var rotate = window.innerWidth < window.innerHeight ? 90 : 0;
+    var scale = rotate
+      ? Math.min(window.innerWidth / 720, window.innerHeight / 1280)
+      : Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    document.documentElement.style.setProperty('--present-rotate', rotate + 'deg');
+    document.documentElement.style.setProperty('--present-scale', String(scale));
+  }
+
+  function showPresentSlide() {
+    var list = slides();
+    list.forEach(function (s, i) { s.classList.toggle('present-active', i === present.index); });
+  }
+
+  function goPresent(delta) {
+    if (!present.on) return;
+    var list = slides();
+    present.index = Math.max(0, Math.min(list.length - 1, present.index + delta));
+    showPresentSlide();
+  }
+
+  function lockLandscape() {
+    var orientation = window.screen && screen.orientation;
+    if (!orientation || !orientation.lock) return Promise.resolve(false);
+    return orientation.lock('landscape').then(function () { return true; }).catch(function () { return false; });
+  }
+
+  function unlockOrientation() {
+    var orientation = window.screen && screen.orientation;
+    if (orientation && orientation.unlock) {
+      try { orientation.unlock(); } catch (e) {}
+    }
+  }
+
+  function requestNativeFullscreen() {
+    var root = document.documentElement;
+    var req = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (!req) return Promise.resolve(false);
+    try {
+      return Promise.resolve(req.call(root)).then(function () { return true; }).catch(function () { return false; });
+    } catch (e) {
+      return Promise.resolve(false);
+    }
+  }
+
+  function exitNativeFullscreen() {
+    var exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if ((document.fullscreenElement || document.webkitFullscreenElement) && exit) {
+      try { return Promise.resolve(exit.call(document)).catch(function () {}); }
+      catch (e) { return Promise.resolve(); }
+    }
+    return Promise.resolve();
+  }
+
+  function enterPresent() {
+    if (isEmbedded) return;
+    present.on = true;
+    present.index = nearestSlideIndex();
+    document.body.classList.add('is-presenting');
+    layoutPresent();
+    showPresentSlide();
+    var btn = document.getElementById('presentToggle');
+    if (btn) btn.textContent = '結束';
+    requestNativeFullscreen().then(lockLandscape).then(layoutPresent);
+  }
+
+  function exitPresent(skipNativeExit) {
+    if (!present.on) return;
+    present.on = false;
+    unlockOrientation();
+    document.body.classList.remove('is-presenting');
+    slides().forEach(function (s) { s.classList.remove('present-active'); });
+    document.documentElement.style.removeProperty('--present-rotate');
+    document.documentElement.style.removeProperty('--present-scale');
+    var btn = document.getElementById('presentToggle');
+    if (btn) btn.textContent = '全螢幕';
+    var target = slides()[present.index];
+    if (target) target.scrollIntoView({ block: 'start' });
+    if (!skipNativeExit) exitNativeFullscreen();
+  }
+
+  function initPresentMode() {
+    document.body.classList.toggle('embedded', isEmbedded);
+    var btn = document.getElementById('presentToggle');
+    if (!btn || isEmbedded) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (present.on) exitPresent(false);
+      else enterPresent();
+    });
+    window.addEventListener('resize', function () { if (present.on) layoutPresent(); });
+    window.addEventListener('orientationchange', function () { if (present.on) setTimeout(layoutPresent, 250); });
+    document.addEventListener('fullscreenchange', function () {
+      if (present.on && !document.fullscreenElement) exitPresent(true);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (!present.on) return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') goPresent(1);
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') goPresent(-1);
+      else if (e.key === 'Escape') exitPresent(false);
+    });
+    document.addEventListener('click', function (e) {
+      if (!present.on || e.target === btn) return;
+      goPresent(e.clientX > window.innerWidth / 2 ? 1 : -1);
+    });
+    document.addEventListener('touchstart', function (e) {
+      if (present.on && e.touches.length) present.touchX = e.touches[0].clientX;
+    }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+      if (!present.on || !e.changedTouches.length) return;
+      var dx = e.changedTouches[0].clientX - present.touchX;
+      if (Math.abs(dx) > 42) goPresent(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  }
+
   /* ---------- 啟動 ---------- */
   renderSenses();
   renderWall();
   renderPhotoPages();
   renumberSlides();
   renderRoi();
+  initPresentMode();
   loadContent().then(function () {
     renumberSlides();
     post({ type: 'ready', slides: document.querySelectorAll('.slide').length });
