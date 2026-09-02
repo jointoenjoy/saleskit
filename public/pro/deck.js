@@ -33,7 +33,7 @@
     wall.innerHTML = D.COURSES.map(function (c, i) {
       var s = senseByKey[c.s] || { color: '#8A95A5' };
       var year = String(c.d).slice(0, 4);
-      var divider = year !== currentYear ? '<div class="course-year"><span>' + year + '</span></div>' : '';
+      var divider = year !== currentYear ? '<div class="course-year y' + year + '"><span>' + year + '</span></div>' : '';
       currentYear = year;
       return divider + '<div class="course"><i style="background:' + s.color + '"></i><div>' +
         '<div class="n" data-edit="course.' + i + '.n">' + c.n + '</div>' +

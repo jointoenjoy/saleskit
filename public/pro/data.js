@@ -52,7 +52,7 @@ const PHOTO_PAGES = {
   face: {
     layout: 'm-3x2', badge: 'THE PEOPLE',
     title: '員工滿意度，從他們臉上看得見',
-    sub: '閉上的眼睛、笑到瞇起來的眼角、捧著作品捨不得放下的手。問卷上的分數，在現場長這個樣子。',
+    sub: '閉上的眼睛、笑到瞇起來的眼角、捧著作品捨不得放下的手。<br>問卷上的分數，在現場長這個樣子。',
     imgs: [
       'moss0731/face-0203.jpg', 'ride0320/face-0097.jpg', 'tree/face-0108.jpg',
       'moss0730/face-0110.jpg', 'moss0731/face-0245.jpg', 'moss0717/scene-0055.jpg',
@@ -61,7 +61,7 @@ const PHOTO_PAGES = {
   scene: {
     layout: 'm-wide', badge: 'THE ATMOSPHERE',
     title: '跨組織的軟性橫向連結',
-    sub: '不同公司、不同部門的人在同一個場域裡放慢下來。沒有正式會議的壓力，反而更容易建立信任。',
+    sub: '不同公司、不同部門的人在同一個場域裡放慢下來。<br>沒有正式會議的壓力，反而更容易建立信任。',
     imgs: [
       'moss0730/scene-0134.jpg', 'tree/scene-0122.jpg', 'sound/scene-0031.jpg',
       'ride0320/scene-0008.jpg', 'moss0731/scene-0012.jpg',
