@@ -15,7 +15,7 @@ const SENSES = [
     desc: '馬術、攀樹、呼吸清理、自癒經絡。用做得到的動作重新認識自己的身體。' },
   { key: 'nature', ko: 'NATURE',  name: '自然・森林療癒', color: '#2E7D6B',
     desc: '水之旅、森之旅、離線之旅。把人整個放進森林裡，讓五感自己打開。' },
-  { key: 'mind',   ko: 'MIND',    name: '心智・正念情緒', color: '#7A4FBF',
+  { key: 'mind',   ko: 'MIND',    name: '心念・正念情緒', color: '#7A4FBF',
     desc: '正念生活道場、情緒關係課、內耗退場。給高壓工作者可操作的心法。' },
 ];
 
@@ -50,12 +50,16 @@ const COURSES = [
    imgs 張數要對得上版位容量（見 deck.js 的 LAYOUT_CAP）。          */
 const PHOTO_PAGES = {
   face: {
-    layout: 'm-3x2', badge: 'THE PEOPLE',
+    layout: 'm-stagger-12', badge: 'THE PEOPLE',
     title: '員工滿意度，從他們臉上看得見',
     sub: '閉上的眼睛、笑到瞇起來的眼角、捧著作品捨不得放下的手。<br>問卷上的分數，在現場長這個樣子。',
     imgs: [
-      'moss0731/face-0203.jpg', 'ride0320/face-0097.jpg', 'tree/face-0108.jpg',
-      'moss0730/face-0110.jpg', 'moss0731/face-0245.jpg', 'moss0717/scene-0055.jpg',
+      'p13-satisfaction/p13-01.jpg', 'p13-satisfaction/p13-02.jpg',
+      'p13-satisfaction/p13-03.jpg', 'p13-satisfaction/p13-04.jpg',
+      'p13-satisfaction/p13-05.jpg', 'p13-satisfaction/p13-06.jpg',
+      'p13-satisfaction/p13-07.jpg', 'p13-satisfaction/p13-08.jpg',
+      'p13-satisfaction/p13-09.jpg', 'p13-satisfaction/p13-10.jpg',
+      'p13-satisfaction/p13-11.jpg', 'p13-satisfaction/p13-12.jpg',
     ],
   },
   scene: {

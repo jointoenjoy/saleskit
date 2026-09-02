@@ -11,7 +11,7 @@
   /* ---------- 1. 動態區塊 ---------- */
 
   // 版位容量：grid 放得下幾張圖。超過的會溢出成破圖，所以在這裡截斷。
-  var LAYOUT_CAP = { 'm-hero': 5, 'm-wide': 5, 'm-3x2': 6, 'm-4x2': 8, 'm-tall': 5, 'm-strip': 4 };
+  var LAYOUT_CAP = { 'm-hero': 5, 'm-wide': 5, 'm-3x2': 6, 'm-4x2': 8, 'm-tall': 5, 'm-strip': 4, 'm-stagger-12': 12 };
 
   function renderSenses() {
     var el = document.getElementById('senseGrid');
@@ -50,7 +50,7 @@
       var cap = LAYOUT_CAP[p.layout] || p.imgs.length;
       var figs = p.imgs.slice(0, cap).map(function (src, i) {
         return '<figure data-img-wrap data-img="photo.' + key + '.' + i + '">' +
-          '<img loading="lazy" src="/assets/photos/' + src + '" alt="">' +
+          '<img loading="eager" decoding="async" src="/assets/photos/' + src + '" alt="">' +
           '</figure>';
       }).join('');
       var pg = sec.querySelector('.pg');
