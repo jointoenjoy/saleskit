@@ -502,6 +502,8 @@
     var ls = cs.letterSpacing === 'normal' ? 0 : px(cs.letterSpacing);
     var deco = cs.textDecorationLine || cs.textDecoration || '';
     return {
+      // 中文字標成繁體中文：沒裝 Noto Sans TC 的電腦，才會改用系統的繁中字型（蘋方、微軟正黑體），不會變成方框
+      lang: face === FONT_CJK ? 'zh-TW' : 'en-US',
       fontFace: face,
       fontSize: Math.round(px(cs.fontSize) * PT * 2) / 2,
       bold: parseInt(cs.fontWeight, 10) >= 600,
@@ -515,7 +517,7 @@
   }
 
   function styleKey(s) {
-    return [s.fontFace, s.fontSize, s.bold, s.italic, s.color, s.transparency, s.charSpacing, !!s.underline, s.strike].join('|');
+    return [s.lang, s.fontFace, s.fontSize, s.bold, s.italic, s.color, s.transparency, s.charSpacing, !!s.underline, s.strike].join('|');
   }
 
   function lineHeightPx(cs) {
