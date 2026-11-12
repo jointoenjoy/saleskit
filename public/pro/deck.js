@@ -216,13 +216,51 @@
     var scale = rotate
       ? Math.min(window.innerWidth / 720, window.innerHeight / 1280)
       : Math.min(window.innerWidth / 1280, window.innerHeight / 720);
-    document.documentElement.style.setProperty('--present-rotate', rotate + 'deg');
-    document.documentElement.style.setProperty('--present-scale', String(scale));
+    var root = document.documentElement.style;
+    root.setProperty('--present-rotate', rotate + 'deg');
+    root.setProperty('--present-scale', String(scale));
+    // 控制列跟著畫面轉向：直式手機時，控制列放在「橫向畫面」的下方
+    root.setProperty('--present-w', (rotate ? window.innerHeight : window.innerWidth) + 'px');
+    root.setProperty('--present-h', (rotate ? window.innerWidth : window.innerHeight) + 'px');
   }
 
   function showPresentSlide() {
     var list = slides();
     list.forEach(function (s, i) { s.classList.toggle('present-active', i === present.index); });
+    updatePresentBar();
+  }
+
+  function el(id) { return document.getElementById(id); }
+
+  function updatePresentBar() {
+    var n = slides().length;
+    var input = el('presentInput');
+    if (input && document.activeElement !== input) input.value = present.index + 1;
+    if (input) input.max = n;
+    if (el('presentTotal')) el('presentTotal').textContent = n;
+    if (el('presentPrev')) el('presentPrev').disabled = present.index <= 0;
+    if (el('presentNext')) el('presentNext').disabled = present.index >= n - 1;
+  }
+
+  function goTo(index) {
+    if (!present.on) return;
+    var list = slides();
+    var i = parseInt(index, 10);
+    if (isNaN(i)) { updatePresentBar(); return; }
+    present.index = Math.max(0, Math.min(list.length - 1, i));
+    showPresentSlide();
+  }
+
+  // 控制列閒置 2.5 秒自動淡出，滑鼠移動或觸控時再出現
+  var idleTimer = null;
+  function wakeBar() {
+    var ui = el('presentUi');
+    if (!ui) return;
+    ui.classList.remove('idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+      if (present.on && document.activeElement !== el('presentInput')) ui.classList.add('idle');
+    }, 2500);
   }
 
   function goPresent(delta) {
@@ -270,10 +308,10 @@
     present.on = true;
     present.index = nearestSlideIndex();
     document.body.classList.add('is-presenting');
+    if (el('presentUi')) el('presentUi').setAttribute('aria-hidden', 'false');
     layoutPresent();
     showPresentSlide();
-    var btn = document.getElementById('presentToggle');
-    if (btn) btn.textContent = '結束';
+    wakeBar();
     requestNativeFullscreen().then(lockLandscape).then(layoutPresent);
   }
 
@@ -283,10 +321,11 @@
     unlockOrientation();
     document.body.classList.remove('is-presenting');
     slides().forEach(function (s) { s.classList.remove('present-active'); });
-    document.documentElement.style.removeProperty('--present-rotate');
-    document.documentElement.style.removeProperty('--present-scale');
-    var btn = document.getElementById('presentToggle');
-    if (btn) btn.textContent = '全螢幕';
+    ['--present-rotate', '--present-scale', '--present-w', '--present-h'].forEach(function (k) {
+      document.documentElement.style.removeProperty(k);
+    });
+    if (el('presentUi')) el('presentUi').setAttribute('aria-hidden', 'true');
+    clearTimeout(idleTimer);
     var target = slides()[present.index];
     if (target) target.scrollIntoView({ block: 'start' });
     if (!skipNativeExit) exitNativeFullscreen();
@@ -301,6 +340,29 @@
       if (present.on) exitPresent(false);
       else enterPresent();
     });
+
+    // 控制列：上一頁／下一頁／指定頁數／離開
+    var bar = el('presentBar');
+    if (bar) {
+      ['click', 'touchstart', 'touchend'].forEach(function (t) {
+        bar.addEventListener(t, function (e) { e.stopPropagation(); wakeBar(); }, { passive: true });
+      });
+    }
+    if (el('presentPrev')) el('presentPrev').addEventListener('click', function () { goPresent(-1); });
+    if (el('presentNext')) el('presentNext').addEventListener('click', function () { goPresent(1); });
+    if (el('presentExit')) el('presentExit').addEventListener('click', function () { exitPresent(false); });
+    var input = el('presentInput');
+    if (input) {
+      input.addEventListener('keydown', function (e) {
+        e.stopPropagation();
+        if (e.key === 'Enter') { goTo(input.value - 1); input.blur(); }
+        else if (e.key === 'Escape') { input.blur(); updatePresentBar(); }
+      });
+      input.addEventListener('change', function () { goTo(input.value - 1); });
+      input.addEventListener('focus', function () { input.select(); wakeBar(); });
+      input.addEventListener('blur', function () { updatePresentBar(); wakeBar(); });
+    }
+    document.addEventListener('mousemove', function () { if (present.on) wakeBar(); });
     window.addEventListener('resize', function () { if (present.on) layoutPresent(); });
     window.addEventListener('orientationchange', function () { if (present.on) setTimeout(layoutPresent, 250); });
     document.addEventListener('fullscreenchange', function () {
@@ -310,20 +372,57 @@
       if (!present.on) return;
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') goPresent(1);
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') goPresent(-1);
+      else if (e.key === 'Home') goTo(0);
+      else if (e.key === 'End') goTo(slides().length - 1);
       else if (e.key === 'Escape') exitPresent(false);
+      wakeBar();
     });
     document.addEventListener('click', function (e) {
       if (!present.on || e.target === btn) return;
-      goPresent(e.clientX > window.innerWidth / 2 ? 1 : -1);
+      if (e.target.closest && e.target.closest('#presentBar')) return;
+      // 直式手機畫面旋轉 90° 時，「右半邊」變成畫面下半部
+      var r = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--present-rotate')) || 0;
+      var forward = r ? e.clientY > window.innerHeight / 2 : e.clientX > window.innerWidth / 2;
+      goPresent(forward ? 1 : -1);
+      wakeBar();
     });
     document.addEventListener('touchstart', function (e) {
-      if (present.on && e.touches.length) present.touchX = e.touches[0].clientX;
+      if (!present.on || !e.touches.length) return;
+      present.touchX = e.touches[0].clientX;
+      present.touchY = e.touches[0].clientY;
+      wakeBar();
     }, { passive: true });
     document.addEventListener('touchend', function (e) {
       if (!present.on || !e.changedTouches.length) return;
-      var dx = e.changedTouches[0].clientX - present.touchX;
-      if (Math.abs(dx) > 42) goPresent(dx < 0 ? 1 : -1);
+      var t = e.changedTouches[0];
+      var rotated = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--present-rotate')) || 0;
+      // 直式手機：畫面轉 90°，往上滑＝往左滑
+      var d = rotated ? t.clientY - present.touchY : t.clientX - present.touchX;
+      if (Math.abs(d) > 42) goPresent(d < 0 ? 1 : -1);
     }, { passive: true });
+  }
+
+  /* ---------- 6. 右下角按鈕固定在「看得到的畫面」角落 ----------
+     手機上簡報寬 1280px，比螢幕寬，position:fixed 會以整頁寬度計算而跑出畫面外。
+     用 visualViewport 把按鈕群組放回目前可見範圍的右下角，縮放時也維持原本大小。 */
+  function initFabPosition() {
+    var g = document.querySelector('.fab-group');
+    var vv = window.visualViewport;
+    if (!g || !vv) return;
+    function place() {
+      var off = Math.abs(window.innerWidth - vv.width) > 1 || Math.abs(window.innerHeight - vv.height) > 1 || vv.scale !== 1;
+      if (!off) { g.style.cssText = ''; return; }
+      var k = 1 / vv.scale;
+      g.style.right = 'auto'; g.style.bottom = 'auto';
+      g.style.transformOrigin = '100% 100%';
+      g.style.transform = 'scale(' + k + ')';
+      g.style.left = (vv.offsetLeft + vv.width - 18 * k - g.offsetWidth) + 'px';
+      g.style.top = (vv.offsetTop + vv.height - 18 * k - g.offsetHeight) + 'px';
+    }
+    vv.addEventListener('resize', place);
+    vv.addEventListener('scroll', place);
+    window.addEventListener('scroll', place, { passive: true });
+    place();
   }
 
   /* ---------- 啟動 ---------- */
@@ -333,6 +432,7 @@
   renumberSlides();
   renderRoi();
   initPresentMode();
+  initFabPosition();
   loadContent().then(function () {
     renumberSlides();
     post({ type: 'ready', slides: document.querySelectorAll('.slide').length });

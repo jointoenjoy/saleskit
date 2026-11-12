@@ -852,22 +852,34 @@
   function init() {
     var btn = document.getElementById('pptxDownload');
     if (!btn) return;
-    var label = btn.textContent;
+    var tip = document.getElementById('pptxStatus');
     var busy = false;
+    function status(t) {
+      if (!tip) return;
+      tip.textContent = t || '';
+      tip.classList.toggle('on', !!t);
+    }
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
       if (busy || document.body.classList.contains('is-presenting')) return;
       busy = true;
-      btn.disabled = true;
-      exportPptx(function (i, n, msg) { btn.textContent = msg || ('產生中 ' + i + '/' + n); })
+      btn.classList.add('busy');
+      btn.setAttribute('aria-busy', 'true');
+      status('準備 PPT…');
+      exportPptx(function (i, n, msg) { status(msg || ('產生中 ' + i + ' / ' + n)); })
+        .then(function () {
+          status('已下載');
+          setTimeout(function () { if (!busy) status(''); }, 1800);
+        })
         .catch(function (err) {
           console.error(err);
+          status('');
           alert('PPT 產生失敗，請重新整理頁面後再試一次。\n' + (err && err.message ? err.message : ''));
         })
         .then(function () {
           busy = false;
-          btn.disabled = false;
-          btn.textContent = label;
+          btn.classList.remove('busy');
+          btn.removeAttribute('aria-busy');
         });
     });
   }

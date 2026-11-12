@@ -10,18 +10,39 @@ html,body{font-family:'Inter','Noto Sans TC','PingFang TC',-apple-system,sans-se
 body{padding:40px 0 120px}
 .deck{display:flex;flex-direction:column;align-items:center;gap:34px;width:1280px;margin:0 auto}
 .slide{width:1280px;height:720px;background:var(--bg);position:relative;overflow:hidden;border-radius:14px;box-shadow:0 12px 48px rgba(0,61,124,.12);flex:none}
-.present-toggle{position:fixed;right:18px;bottom:18px;z-index:1000;border:0;border-radius:999px;background:var(--blue);color:#fff;font-family:inherit;font-size:15px;font-weight:700;line-height:1;padding:14px 18px;box-shadow:0 10px 28px rgba(0,61,124,.24);cursor:pointer}
-.present-toggle:active{transform:translateY(1px)}
-body.embedded .present-toggle,body.editing .present-toggle{display:none}
-.pptx-download{position:fixed;right:18px;bottom:76px;z-index:1000;border:1px solid rgba(0,61,124,.18);border-radius:999px;background:#fff;color:var(--blue);font-family:inherit;font-size:15px;font-weight:700;line-height:1;padding:13px 18px;box-shadow:0 10px 28px rgba(0,61,124,.16);cursor:pointer}
-.pptx-download:disabled{cursor:progress;opacity:.85}
-body.embedded .pptx-download,body.editing .pptx-download,body.is-presenting .pptx-download{display:none}
-@media print{.pptx-download,.present-toggle{display:none}}
+.fab-group{position:fixed;right:18px;bottom:18px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fab{width:46px;height:46px;border-radius:50%;border:1px solid rgba(0,61,124,.14);background:rgba(255,255,255,.94);color:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 22px rgba(0,61,124,.16);transition:transform .15s,box-shadow .15s;padding:0;-webkit-tap-highlight-color:transparent}
+.fab:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,61,124,.22)}
+.fab:active{transform:translateY(1px)}
+.fab svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fab-primary{background:var(--blue);color:#fff;border-color:transparent}
+.fab.busy{cursor:progress;color:var(--t3)}
+.fab.busy svg{animation:fab-bob 1s ease-in-out infinite}
+@keyframes fab-bob{50%{transform:translateY(3px)}}
+.fab-tip{position:absolute;right:56px;bottom:66px;white-space:nowrap;background:rgba(10,25,41,.86);color:#fff;font-size:13.5px;font-weight:600;border-radius:999px;padding:7px 12px;opacity:0;pointer-events:none;transition:opacity .2s}
+.fab-tip.on{opacity:1}
+body.embedded .fab-group,body.editing .fab-group,body.is-presenting .fab-group{display:none}
+@media print{.fab-group,.present-ui{display:none!important}}
+
+/* ---- 全螢幕播放控制列 ---- */
+.present-ui{display:none}
+body.is-presenting .present-ui{display:block;position:fixed;left:50%;top:50%;width:var(--present-w,100vw);height:var(--present-h,100vh);transform:translate(-50%,-50%) rotate(var(--present-rotate,0deg));z-index:1001;pointer-events:none}
+.present-bar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;border-radius:999px;background:rgba(10,25,41,.52);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:auto;transition:opacity .35s;color:#fff}
+.present-ui.idle .present-bar{opacity:0;pointer-events:none}
+.pb-btn{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.pb-btn:hover{background:rgba(255,255,255,.14)}
+.pb-btn:disabled{opacity:.3;cursor:default;background:transparent}
+.pb-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pb-page{display:flex;align-items:center;gap:7px;padding:0 8px;font-size:15px;font-weight:600;color:rgba(255,255,255,.78);font-variant-numeric:tabular-nums}
+.pb-page b{font-weight:600}
+.pb-page input{width:46px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff;font:inherit;font-weight:700;text-align:center;-moz-appearance:textfield;appearance:textfield;outline:none}
+.pb-page input:focus{border-color:#fff;background:rgba(255,255,255,.2)}
+.pb-page input::-webkit-outer-spin-button,.pb-page input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.pb-sep{width:1px;height:22px;background:rgba(255,255,255,.22);margin:0 4px}
 body.is-presenting{padding:0;overflow:hidden;background:#000;touch-action:none}
 body.is-presenting .deck{width:100vw;height:100dvh;margin:0;display:block;overflow:hidden}
 body.is-presenting .slide{display:none}
 body.is-presenting .slide.present-active{display:block;position:fixed;left:50%;top:50%;width:1280px;height:720px;border-radius:0;box-shadow:none;transform:translate(-50%,-50%) rotate(var(--present-rotate,0deg)) scale(var(--present-scale,1));transform-origin:center center}
-body.is-presenting .present-toggle{right:14px;bottom:14px;background:rgba(0,40,80,.82);font-size:14px;padding:12px 15px}
 
 /* ---- type scale (同 練息場 Saleskit) ---- */
 .eyebrow{font-size:14px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
@@ -652,3 +673,26 @@ body.editing figure[data-img-wrap]:hover::after{content:"換圖";position:absolu
 .en-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 12%;display:block}
 .en-sol{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .en-sol span{font-size:14.5px;font-weight:600;color:var(--blue);background:var(--blue-lt);border-radius:10px;padding:7px 8px;text-align:center}
+
+/* ---- P36 ESG：左右兩欄同高、卡片上下緣對齊 ---- */
+.esg-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:24px;margin-top:18px;height:428px}
+.esg-col{display:flex;flex-direction:column;min-height:0}
+.esg-h{margin-bottom:10px}
+.esg-list{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0}
+.esg-g{flex:1;display:flex;flex-direction:column;justify-content:center;padding:16px 22px!important}
+.esg-g .sm{margin-top:7px;line-height:1.6}
+.esg-s{flex:1;align-items:center!important;padding:10px 18px!important}
+.esg-s .no{width:42px!important;height:42px!important;font-size:16px!important}
+.esg-s .dd{line-height:1.45}
+
+/* ---- P32 Step 3：線上解方卡（與 Step 1、2 同風格）---- */
+.en-solve{flex:1;min-height:0;background:#fff;border:1px solid var(--border);border-radius:18px;padding:16px 18px;box-shadow:0 12px 32px rgba(0,61,124,.08);display:flex;flex-direction:column;gap:8px}
+.en-solve .en-rh{margin-bottom:2px}
+.en-breath{display:flex;align-items:center;gap:14px;background:#EEF2FB;border-radius:16px;padding:10px 14px}
+.en-ball{flex:none;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;background:radial-gradient(circle at 35% 30%,#A9C8FF 0%,#5B8DEF 45%,#2C5BD8 100%);box-shadow:0 6px 16px rgba(44,91,216,.35)}
+.en-breath .en-td{line-height:1.4}
+.en-item{flex:1;display:flex;align-items:center;gap:12px;min-height:0}
+.en-ic{flex:none;width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.en-ic img{max-width:30px;max-height:30px;object-fit:contain}
+.en-it{font-size:16px;font-weight:700;color:var(--text)}
+.en-id{font-size:13.5px;color:var(--t3);margin-top:1px}

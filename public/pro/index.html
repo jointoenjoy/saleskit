@@ -13,8 +13,24 @@
 <link rel="stylesheet" href="/pro/deck.css">
 </head>
 <body>
-<button class="present-toggle" id="presentToggle" type="button" aria-label="全螢幕橫式播放">全螢幕</button>
-<button class="pptx-download" id="pptxDownload" type="button" aria-label="下載可編輯 PPT">下載 PPT</button>
+<div class="fab-group">
+  <span class="fab-tip" id="pptxStatus" role="status" aria-live="polite"></span>
+  <button class="fab" id="pptxDownload" type="button" title="下載可編輯 PPT" aria-label="下載可編輯 PPT">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="M7 10.5l5 5 5-5"/><path d="M5 19.5h14"/></svg>
+  </button>
+  <button class="fab fab-primary" id="presentToggle" type="button" title="全螢幕播放" aria-label="全螢幕播放">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+  </button>
+</div>
+<div class="present-ui" id="presentUi" aria-hidden="true">
+  <div class="present-bar" id="presentBar">
+    <button class="pb-btn" id="presentPrev" type="button" title="上一頁" aria-label="上一頁"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <label class="pb-page"><input id="presentInput" type="number" inputmode="numeric" min="1" value="1" aria-label="跳到第幾頁"><span>/ <b id="presentTotal">1</b></span></label>
+    <button class="pb-btn" id="presentNext" type="button" title="下一頁" aria-label="下一頁"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    <i class="pb-sep"></i>
+    <button class="pb-btn" id="presentExit" type="button" title="離開全螢幕（Esc）" aria-label="離開全螢幕"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg></button>
+  </div>
+</div>
 <div class="deck" id="deck">
 
 <!-- 01 封面 -->
@@ -874,9 +890,15 @@
       <div class="en-arrow">→</div>
       <div class="en-col">
         <div class="en-no" data-edit="en.k3">STEP 3 · 線上解方</div>
-        <figure class="en-shot" data-img-wrap data-img="en.shot"><img src="/pro/figma/course2/energy-breathe.png" alt="60 秒諧振呼吸練習"></figure>
-        <div class="en-sol">
-          <span data-edit="en.s1">60 秒諧振呼吸</span><span data-edit="en.s2">15 分鐘微課程</span><span data-edit="en.s3">AI 能量助教</span><span data-edit="en.s4">真人療癒預約</span>
+        <div class="en-solve">
+          <div class="en-rh" data-edit="en.sh">為你推薦的解方</div>
+          <div class="en-breath">
+            <div class="en-ball" data-edit="en.ball">吸</div>
+            <div><div class="en-tt" data-edit="en.s1">60 秒諧振呼吸</div><div class="en-td" data-edit="en.s1d">吸 5.5 秒・吐 5.5 秒，身體先穩下來</div></div>
+          </div>
+          <div class="en-item"><span class="en-ic" style="background:#99DAFF"><img src="/pro/figma/course2/icon-course.png" alt=""></span><div><div class="en-it" data-edit="en.s2">15 分鐘微課程</div><div class="en-id" data-edit="en.s2d">看懂正在耗電的自己</div></div></div>
+          <div class="en-item"><span class="en-ic" style="background:#73E383"><img src="/pro/figma/course2/icon-ai.png" alt=""></span><div><div class="en-it" data-edit="en.s3">AI 能量助教</div><div class="en-id" data-edit="en.s3d">把煩惱整理成做得到的小行動</div></div></div>
+          <div class="en-item"><span class="en-ic" style="background:#FFC2F4"><img src="/pro/figma/course2/icon-human.png" alt=""></span><div><div class="en-it" data-edit="en.s4">真人療癒預約</div><div class="en-id" data-edit="en.s4d">需要時，交給心理師與療癒師</div></div></div>
         </div>
       </div>
     </div>
@@ -987,20 +1009,23 @@
   <div class="pad" style="padding-top:110px">
     <div class="titlebar"><h2 class="h1" style="font-size:38px" data-edit="p24.title">直接對接 ESG 揭露與 SDGs</h2></div>
     <p class="body" style="margin-top:12px;max-width:980px" data-edit="p24.lead">員工滿意度不只是人資議題，也是永續報告書裡的社會（S）與治理（G）實績。練息場的產出可以直接引用。</p>
-    <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:24px;margin-top:18px;align-items:stretch">
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div class="card" style="padding:18px 22px"><div class="eyebrow" style="color:var(--green)" data-edit="p24.g1k">GRI 403 · 職業健康與安全</div><p class="sm" style="margin-top:7px;line-height:1.62" data-edit="p24.g1b">心理健康促進措施、參與人次、前後測成效，皆為可量化的揭露素材。</p></div>
-        <div class="card" style="padding:18px 22px"><div class="eyebrow" style="color:var(--green)" data-edit="p24.g2k">GRI 401 · 勞雇關係</div><p class="sm" style="margin-top:7px;line-height:1.62" data-edit="p24.g2b">離職率變化、留任成效與員工福利投入，附學術量表為佐證來源。</p></div>
-        <div class="card-b" style="padding:18px 22px"><div class="eyebrow" style="color:var(--yellow)" data-edit="p24.g3k">G · 治理與風險管理</div><p class="sm" style="margin-top:7px;line-height:1.62;color:rgba(255,255,255,.84)" data-edit="p24.g3b">把「人才流失」與「組織耗竭」納入可監測的風險指標，而非事後才知道。</p></div>
+    <div class="esg-grid">
+      <div class="esg-col">
+        <div class="eyebrow esg-h" data-edit="p24.gk">對應 GRI 永續揭露準則</div>
+        <div class="esg-list">
+          <div class="card esg-g"><div class="eyebrow" style="color:var(--green)" data-edit="p24.g1k">GRI 403 · 職業健康與安全</div><p class="sm" data-edit="p24.g1b">心理健康促進措施、參與人次、前後測成效，皆為可量化的揭露素材。</p></div>
+          <div class="card esg-g"><div class="eyebrow" style="color:var(--green)" data-edit="p24.g2k">GRI 401 · 勞雇關係</div><p class="sm" data-edit="p24.g2b">離職率變化、留任成效與員工福利投入，附學術量表為佐證來源。</p></div>
+          <div class="card-b esg-g"><div class="eyebrow" style="color:var(--yellow)" data-edit="p24.g3k">G · 治理與風險管理</div><p class="sm" style="color:rgba(255,255,255,.84)" data-edit="p24.g3b">把「人才流失」與「組織耗竭」納入可監測的風險指標，而非事後才知道。</p></div>
+        </div>
       </div>
-      <div>
-        <div class="eyebrow" style="margin-bottom:12px" data-edit="p24.sk">對應聯合國永續發展目標</div>
-        <div style="display:flex;flex-direction:column;gap:7px">
-          <div class="sdg" style="padding:11px 18px"><div class="no" style="background:#4C9F38;width:42px;height:42px;font-size:16px" data-edit="p24.a1">3</div><div><div class="tt" data-edit="p24.a1t">SDG 3 · 良好健康與福祉</div><div class="dd" style="line-height:1.45" data-edit="p24.a1d">身體感受 +45.3%、情緒狀態 +44.7%，附樣本數與統計方法，可直接引用。</div></div></div>
-          <div class="sdg" style="padding:11px 18px"><div class="no" style="background:#A21942;width:42px;height:42px;font-size:16px" data-edit="p24.a2">8</div><div><div class="tt" data-edit="p24.a2t">SDG 8 · 合宜工作與經濟成長</div><div class="dd" style="line-height:1.45" data-edit="p24.a2d">以工作環境品質與員工滿意度為指標，補上薪酬數字之外的實質內涵。</div></div></div>
-          <div class="sdg" style="padding:11px 18px"><div class="no" style="background:#BF8B2E;width:42px;height:42px;font-size:16px" data-edit="p24.a3">12</div><div><div class="tt" data-edit="p24.a3t">SDG 12 · 責任消費與生產</div><div class="dd" style="line-height:1.45" data-edit="p24.a3d">選用在地職人、當季素材與可重複使用器皿，減少一次性耗材。</div></div></div>
-          <div class="sdg" style="padding:11px 18px"><div class="no" style="background:#56C02B;width:42px;height:42px;font-size:16px" data-edit="p24.a4">15</div><div><div class="tt" data-edit="p24.a4t">SDG 15 · 陸域生態</div><div class="dd" style="line-height:1.45" data-edit="p24.a4d">攀樹、森林療癒與苔球植栽由專業職人帶領，同步傳遞生態知識。</div></div></div>
-          <div class="sdg" style="padding:11px 18px"><div class="no" style="background:#19486A;width:42px;height:42px;font-size:16px" data-edit="p24.a5">17</div><div><div class="tt" data-edit="p24.a5t">SDG 17 · 夥伴關係</div><div class="dd" style="line-height:1.45" data-edit="p24.a5d">與大學心輔學術團隊產學合作，共同開發本土職場量表。</div></div></div>
+      <div class="esg-col">
+        <div class="eyebrow esg-h" data-edit="p24.sk">對應聯合國永續發展目標</div>
+        <div class="esg-list">
+          <div class="sdg esg-s"><div class="no" style="background:#4C9F38" data-edit="p24.a1">3</div><div><div class="tt" data-edit="p24.a1t">SDG 3 · 良好健康與福祉</div><div class="dd" data-edit="p24.a1d">身體感受 +45.3%、情緒狀態 +44.7%，附樣本數與統計方法，可直接引用。</div></div></div>
+          <div class="sdg esg-s"><div class="no" style="background:#A21942" data-edit="p24.a2">8</div><div><div class="tt" data-edit="p24.a2t">SDG 8 · 合宜工作與經濟成長</div><div class="dd" data-edit="p24.a2d">以工作環境品質與員工滿意度為指標，補上薪酬數字之外的實質內涵。</div></div></div>
+          <div class="sdg esg-s"><div class="no" style="background:#BF8B2E" data-edit="p24.a3">12</div><div><div class="tt" data-edit="p24.a3t">SDG 12 · 責任消費與生產</div><div class="dd" data-edit="p24.a3d">選用在地職人、當季素材與可重複使用器皿，減少一次性耗材。</div></div></div>
+          <div class="sdg esg-s"><div class="no" style="background:#56C02B" data-edit="p24.a4">15</div><div><div class="tt" data-edit="p24.a4t">SDG 15 · 陸域生態</div><div class="dd" data-edit="p24.a4d">攀樹、森林療癒與苔球植栽由專業職人帶領，同步傳遞生態知識。</div></div></div>
+          <div class="sdg esg-s"><div class="no" style="background:#19486A" data-edit="p24.a5">17</div><div><div class="tt" data-edit="p24.a5t">SDG 17 · 夥伴關係</div><div class="dd" data-edit="p24.a5d">與大學心輔學術團隊產學合作，共同開發本土職場量表。</div></div></div>
         </div>
       </div>
     </div>
